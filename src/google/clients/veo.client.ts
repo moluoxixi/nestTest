@@ -31,7 +31,7 @@ export class Veo {
     if (!videoFile)
       throw new Error('No generated video file returned')
 
-    const defaultDir = resolve(__dirname, '..', 'files')
+    const defaultDir = resolve(process.cwd(), 'public', 'files')
     const randomName = `video_${Date.now()}_${Math.random().toString(36).slice(2, 10)}.mp4`
     const finalDownloadPath = downloadPath || resolve(defaultDir, randomName)
 

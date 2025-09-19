@@ -21,7 +21,7 @@ import { join } from 'node:path'
     ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     // 静态资源：用于暴露生成的文件（/files/**）
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'google', 'files'),
+      rootPath: join(process.cwd(), 'public', 'files'),
       serveRoot: '/files',
     }),
     PrismaModule.forRoot({

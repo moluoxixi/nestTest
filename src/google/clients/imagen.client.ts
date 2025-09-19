@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { mkdir } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import type { imagenGenerateImagesParamsType, imagenGenerateImagesResultType } from '../types/imagen'
 
 export class Imagen {
@@ -22,7 +22,7 @@ export class Imagen {
       throw new Error('No generated images returned')
 
     // 保存到 dist/google/files
-    const defaultDir = resolve(__dirname, '..', 'files')
+    const defaultDir = resolve(process.cwd(), 'public', 'files')
     await mkdir(defaultDir, { recursive: true })
 
     if (downloadPath) {
@@ -36,6 +36,7 @@ export class Imagen {
           const path = base.endsWith('.png') || base.endsWith('.jpg') || base.endsWith('.jpeg') || base.endsWith('.webp')
             ? base.replace(/(\.[a-z0-9]+)$/i, `${suffix}$1`)
             : `${base}${suffix}.png`
+          await mkdir(dirname(path), { recursive: true })
           await this.ai.files.download({ file: files[i], downloadPath: path })
         }
       }
@@ -44,6 +45,7 @@ export class Imagen {
       for (let i = 0; i < files.length; i++) {
         const randomName = `image_${Date.now()}_${Math.random().toString(36).slice(2, 10)}_${i}.png`
         const path = resolve(defaultDir, randomName)
+        await mkdir(dirname(path), { recursive: true })
         await this.ai.files.download({ file: files[i], downloadPath: path })
       }
     }

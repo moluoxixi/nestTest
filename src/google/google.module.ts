@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common'
 import { GoogleService } from './google.service'
-import { VeoController } from './veo.controller'
-import { ImagenController } from './imagen.controller'
+import controllers from './controllers'
 
 @Module({
   providers: [GoogleService],
-  controllers: [VeoController, ImagenController],
+  controllers,
 })
 export class GoogleModule {}

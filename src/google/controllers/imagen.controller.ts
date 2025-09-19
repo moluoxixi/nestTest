@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import type { GoogleService } from './google.service'
+import type { GoogleService } from '../google.service'
 
 @Controller('imagen')
 export class ImagenController {
@@ -14,9 +14,7 @@ export class ImagenController {
       model: body?.model,
       downloadPath: `${baseWithoutExt}.png`,
     })
-    // 根据实现，可能会生成多图，拼接索引后缀 _1, _2 ...
     const downPaths: string[] = []
-    // 推断保存的文件名集合（最少包含 baseWithoutExt.png）
     downPaths.push(`/files/${baseWithoutExt.split('files').pop()?.replace(/^[\\/]/, '')}.png`.replace(/\\/g, '/'))
     return { downPaths }
   }

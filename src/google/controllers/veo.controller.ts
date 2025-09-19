@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import type { GoogleService } from './google.service'
+import type { GoogleService } from '../google.service'
 
 @Controller('veo')
 export class VeoController {
