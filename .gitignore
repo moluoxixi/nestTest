@@ -6,6 +6,7 @@ public
 # Logs
 logs
 *.exe
+*.pid
 *.log
 *.err
 npm-debug.log*
