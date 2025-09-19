@@ -1,0 +1,53 @@
+import { GraphQLModule } from '@nestjs/graphql'
+import { Logger, Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { loggingMiddleware, PrismaModule } from 'nestjs-prisma'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { AppResolver } from './app.resolver'
+import { AuthModule } from './auth/auth.module'
+import { UsersModule } from './users/users.module'
+import { PostsModule } from './posts/posts.module'
+import config from './common/configs/config'
+import type { ApolloDriverConfig } from '@nestjs/apollo'
+import { ApolloDriver } from '@nestjs/apollo'
+import { GqlConfigService } from './gql-config.service'
+import { GoogleModule } from './google/google.module'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'node:path'
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    // 静态资源：用于暴露生成的文件（/files/**）
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'google', 'files'),
+      serveRoot: '/files',
+    }),
+    PrismaModule.forRoot({
+      isGlobal: true,
+      prismaServiceOptions: {
+        middlewares: [
+          // configure your prisma middleware
+          loggingMiddleware({
+            logger: new Logger('PrismaMiddleware'),
+            logLevel: 'log',
+          }),
+        ],
+      },
+    }),
+
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      useClass: GqlConfigService,
+    }),
+
+    AuthModule,
+    UsersModule,
+    PostsModule,
+    GoogleModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService, AppResolver],
+})
+export class AppModule {}
