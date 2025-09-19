@@ -6,9 +6,10 @@ export class VeoController {
   constructor(private readonly google: GoogleService) {}
 
   @Post('generateVideos')
-  async generateVideos(@Body() body: { prompt?: string, model?: string, pollIntervalMs?: number }) {
+  async generateVideos(@Body() body: { apiKey: string, prompt?: string, model?: string, pollIntervalMs?: number }) {
     const downloadPath = this.google.buildDownloadPath('video', 'mp4')
-    const res = await this.google.client.veoGenerateVideos({
+    const client = this.google.getClient(body.apiKey)
+    const res = await client.veoGenerateVideos({
       prompt: body?.prompt || '',
       model: body?.model,
       pollIntervalMs: body?.pollIntervalMs,

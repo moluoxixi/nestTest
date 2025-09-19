@@ -4,10 +4,8 @@ import { join } from 'node:path'
 
 @Injectable()
 export class GoogleService {
-  private readonly gm = createGoogleModels(process.env.GOOGLE_API_KEY || '')
-
-  get client() {
-    return this.gm
+  getClient(apiKey: string) {
+    return createGoogleModels(apiKey)
   }
 
   buildDownloadPath(prefix: 'video' | 'image', ext: string) {
