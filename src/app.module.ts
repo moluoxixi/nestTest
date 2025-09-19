@@ -2,15 +2,12 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { Logger, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { loggingMiddleware, PrismaModule } from 'nestjs-prisma'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AppResolver } from './app.resolver'
 import { AuthModule } from './auth/auth.module'
 import { UsersModule } from './users/users.module'
 import { PostsModule } from './posts/posts.module'
 import config from './common/configs/config'
-import type { ApolloDriverConfig } from '@nestjs/apollo'
-import { ApolloDriver } from '@nestjs/apollo'
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
+
 import { GqlConfigService } from './gql-config.service'
 import { GoogleModule } from './google/google.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
@@ -47,7 +44,5 @@ import { join } from 'node:path'
     PostsModule,
     GoogleModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppResolver],
 })
 export class AppModule {}

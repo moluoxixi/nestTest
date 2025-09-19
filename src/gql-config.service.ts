@@ -1,8 +1,8 @@
-import type { GraphqlConfig } from './common/configs/config.interface'
-import type { ConfigService } from '@nestjs/config'
-import type { ApolloDriverConfig } from '@nestjs/apollo'
+import { GraphqlConfig } from './common/configs/config.interface'
+import { ConfigService } from '@nestjs/config'
+import { ApolloDriverConfig } from '@nestjs/apollo'
 import { Injectable } from '@nestjs/common'
-import type { GqlOptionsFactory } from '@nestjs/graphql'
+import { GqlOptionsFactory } from '@nestjs/graphql'
 
 @Injectable()
 export class GqlConfigService implements GqlOptionsFactory {

@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import type { imagenGenerateImagesParamsType, imagenGenerateImagesResultType } from '../types/imagen'
+import { imagenGenerateImagesParamsType, imagenGenerateImagesResultType } from '../types/imagen'
 
 export class Imagen {
   protected ai: any
@@ -55,5 +55,3 @@ export class Imagen {
 }
 
 export default Imagen
-
-

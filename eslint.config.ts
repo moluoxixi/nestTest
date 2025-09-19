@@ -7,4 +7,7 @@ module.exports = eslintConfig({
     '.husky/**',
     '**/*.md',
   ],
+  rules: {
+    'ts/consistent-type-imports': 'off',
+  },
 })

@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai'
-import type { lyriaGenerateMusicParamsType, lyriaGenerateMusicResultType } from '../types/lyria'
+import { lyriaGenerateMusicParamsType, lyriaGenerateMusicResultType } from '../types/lyria'
 
 export class Lyria {
   protected ai: any
@@ -17,5 +17,3 @@ export class Lyria {
 }
 
 export default Lyria
-
-

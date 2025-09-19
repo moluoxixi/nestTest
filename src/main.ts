@@ -4,7 +4,7 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { PrismaClientExceptionFilter } from 'nestjs-prisma'
 import { AppModule } from './app.module'
-import type {
+import {
   CorsConfig,
   NestConfig,
   SwaggerConfig,

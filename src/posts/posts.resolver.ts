@@ -1,4 +1,4 @@
-import type { PrismaService } from 'nestjs-prisma'
+import { PrismaService } from 'nestjs-prisma'
 import {
   Args,
   Mutation,
@@ -11,16 +11,16 @@ import {
 import { findManyCursorConnection } from '@devoxa/prisma-relay-cursor-connection'
 import { PubSub } from 'graphql-subscriptions'
 import { UseGuards } from '@nestjs/common'
-import type { PaginationArgs } from '../common/pagination/pagination.args'
-import { UserEntity } from '../common/decorators/user.decorator'
+import { PaginationArgs } from '../common/pagination/pagination.args'
 import { User } from '../users/models/user.model'
+import { UserEntity } from '../common/decorators/user.decorator'
 import { GqlAuthGuard } from '../auth/gql-auth.guard'
-import type { PostIdArgs } from './args/post-id.args'
-import type { UserIdArgs } from './args/user-id.args'
+import { PostIdArgs } from './args/post-id.args'
+import { UserIdArgs } from './args/user-id.args'
 import { Post } from './models/post.model'
 import { PostConnection } from './models/post-connection.model'
 import { PostOrder } from './dto/post-order.input'
-import type { CreatePostInput } from './dto/createPost.input'
+import { CreatePostInput } from './dto/createPost.input'
 
 const pubSub = new PubSub()
 
@@ -91,14 +91,6 @@ export class PostsResolver {
     return this.prisma.user
       .findUnique({ where: { id: id.userId } })
       .posts({ where: { published: true } })
-
-    // or
-    // return this.prisma.posts.findMany({
-    //   where: {
-    //     published: true,
-    //     author: { id: id.userId }
-    //   }
-    // });
   }
 
   @Query(() => Post)

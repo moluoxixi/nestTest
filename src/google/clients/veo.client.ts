@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import type { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '../types/veo'
+import { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '../types/veo'
 
 export class Veo {
   protected ai: any
@@ -43,5 +43,3 @@ export class Veo {
 }
 
 export default Veo
-
-

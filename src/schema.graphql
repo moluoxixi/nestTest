@@ -3,14 +3,10 @@
 # ------------------------------------------------------
 
 type Auth {
-  """
-  JWT access token
-  """
+  """JWT access token"""
   accessToken: JWT!
 
-  """
-  JWT refresh token
-  """
+  """JWT refresh token"""
   refreshToken: JWT!
   user: User!
 }
@@ -68,17 +64,13 @@ type Post {
   author: User
   content: String
 
-  """
-  Identifies the date and time when the object was created.
-  """
+  """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
   published: Boolean!
   title: String!
 
-  """
-  Identifies the date and time when the object was last updated.
-  """
+  """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
 }
 
@@ -98,9 +90,7 @@ input PostOrder {
   field: PostOrderField!
 }
 
-"""
-Properties by which post connections can be ordered.
-"""
+"""Properties by which post connections can be ordered."""
 enum PostOrderField {
   content
   createdAt
@@ -111,17 +101,13 @@ enum PostOrderField {
 }
 
 type Query {
-  hello(name: String!): String!
-  helloWorld: String!
   me: User!
   post: Post!
   publishedPosts(orderBy: PostOrder, query: String): PostConnection!
   userPosts: [Post!]!
 }
 
-"""
-User role
-"""
+"""User role"""
 enum Role {
   ADMIN
   USER
@@ -139,14 +125,10 @@ type Subscription {
 }
 
 type Token {
-  """
-  JWT access token
-  """
+  """JWT access token"""
   accessToken: JWT!
 
-  """
-  JWT refresh token
-  """
+  """JWT refresh token"""
   refreshToken: JWT!
 }
 
@@ -156,9 +138,7 @@ input UpdateUserInput {
 }
 
 type User {
-  """
-  Identifies the date and time when the object was created.
-  """
+  """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   email: String!
   firstname: String
@@ -167,8 +147,6 @@ type User {
   posts: [Post!]
   role: Role!
 
-  """
-  Identifies the date and time when the object was last updated.
-  """
+  """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
 }
