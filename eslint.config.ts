@@ -2,7 +2,7 @@ import eslintConfig from '@moluoxixi/eslintconfig'
 
 module.exports = eslintConfig({
   ignores: [
-    'metadata.ts',
+    '**/metadata.ts',
     '**/*.spec.ts',
     '.husky/**',
     '**/*.md',
