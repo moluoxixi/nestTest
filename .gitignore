@@ -5,6 +5,7 @@ public
 
 # Logs
 logs
+*.exe
 *.log
 *.err
 npm-debug.log*

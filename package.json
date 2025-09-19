@@ -49,7 +49,9 @@
     "init:db:reset": "sh ./scripts/init.sh --recreate-db",
     "deploy": "sh ./scripts/publish.sh",
     "run:dev": "nest start --watch",
-    "run:prod": "node dist/main"
+    "run:prod": "node dist/main",
+    "tunnel:4000": "sh ./scripts/tunnel.sh 4000",
+    "tunnel:stop": "sh ./scripts/tunnel-stop.sh 4000"
   },
   "dependencies": {
     "@apollo/server": "^4.7.5",
