@@ -22,7 +22,7 @@ function runProd(options: runProdParamsType = {}) {
   }
   // 运行容器（依赖外部 DB，通过 .env 提供 DATABASE_URL）
   exec(
-    `docker run -d -t --name ${containerName} -p 3000:3000 --env-file .env ${tag}`,
+    `docker run -d -t --name ${containerName} -p 4000:4000 --env-file .env ${tag}`,
   )
 }
 

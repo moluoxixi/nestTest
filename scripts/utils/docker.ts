@@ -51,18 +51,18 @@ export function ensureDockerDesktop(options: ensureDockerOptionsType = {}) {
  * @param {string} options.name - 容器名称
  * @returns {boolean} 是否存在
  */
-export function containerExists(options: containerExistsParamsType = {}) {
-  const { name = '' } = options
-  if (!name) return false
+export function containerExists(options: containerExistsParamsType = {}): boolean {
+  const { name = '' } = options;
+  if (!name) return false;
   try {
     const result = execSync(`docker ps -aq -f name=^/${name}$`, {
       cwd: resolve(process.cwd()),
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf-8',
-    }) as unknown as string
-    return result.trim().length > 0
+    }) as unknown as string;
+    return result.trim().length > 0;
   } catch {
-    return false
+    return false;
   }
 }
 

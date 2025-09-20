@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { Request } from 'express'
 import { GoogleService } from '../google.service'
 
@@ -6,10 +6,10 @@ import { GoogleService } from '../google.service'
 export class VeoController {
   constructor(private readonly google: GoogleService) {}
 
-  // @Get('hello/:name')
-  // getHelloName(@Param('name') name: string): string {
-  //   return `Hello ${name}!`
-  // }
+  @Get('hello/:name')
+  getHelloName(@Param('name') name: string): string {
+    return `Hello ${name}!`
+  }
 
   @Post('generateVideos')
   async generateVideos(@Req() req: Request, @Body() body: { apiKey: string, prompt: string, model?: string, pollIntervalMs?: number }) {
