@@ -1,6 +1,7 @@
 import { execSync, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import type { ensureDockerOptionsType } from '../_types/ensure-docker'
+import { resolve } from 'node:path'
+import type { ensureDockerOptionsType, containerExistsParamsType } from './_types/docker'
 
 /**
  * 确保 Docker Desktop 已启动并等待 Docker 引擎就绪（Windows）
@@ -42,6 +43,27 @@ export function ensureDockerDesktop(options: ensureDockerOptionsType = {}) {
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, pollIntervalMs)
   }
   throw new Error('Docker 未就绪：请确认 Docker Desktop 已安装并启动。')
+}
+
+/**
+ * 检查容器是否存在
+ * @param {containerExistsParamsType} options - 参数对象
+ * @param {string} options.name - 容器名称
+ * @returns {boolean} 是否存在
+ */
+export function containerExists(options: containerExistsParamsType = {}) {
+  const { name = '' } = options
+  if (!name) return false
+  try {
+    const result = execSync(`docker ps -aq -f name=^/${name}$`, {
+      cwd: resolve(process.cwd()),
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf-8',
+    }) as unknown as string
+    return result.trim().length > 0
+  } catch {
+    return false
+  }
 }
 
 

@@ -1,4 +1,4 @@
-FROM node:16 AS builder
+FROM node:20 AS builder
 
 # Create app directory
 WORKDIR /app
@@ -8,13 +8,14 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install app dependencies
-RUN npm install
+RUN yarn install
 
 COPY . .
 
-RUN npm run build
+RUN npx prisma generate
+RUN yarn build
 
-FROM node:16
+FROM node:20
 
 WORKDIR /app
 
@@ -23,4 +24,4 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
-CMD [ "npm", "run", "start:prod" ]
+CMD [ "node", "dist/main.js" ]

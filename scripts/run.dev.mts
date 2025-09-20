@@ -1,11 +1,6 @@
-import { execSync } from 'node:child_process'
-import { resolve } from 'node:path'
-import { ensureDockerDesktop } from './utils/ensure-docker'
+import { ensureDockerDesktop } from './utils/docker'
+import { exec } from './utils/exec'
 import type { runDevParamsType } from './_types/run.dev'
-
-function exec(command: string) {
-  execSync(command, { stdio: 'inherit', cwd: resolve(process.cwd()) })
-}
 
 
 /**
