@@ -1,14 +1,7 @@
-import { ensureDockerDesktop, containerExists } from './utils/docker'
+import { containerExists, ensureDockerDesktop } from './utils/docker'
 import { exec, pipeExec } from './utils/exec'
 import type { runProdParamsType } from './_types'
 
-/**
- * 检查容器是否存在（兼容旧签名）
- * @deprecated 请使用 utils/docker.containerExists({ name })
- */
-function containerExistsCompat(name: string): boolean {
-  return containerExists({ name })
-}
 /**
  * 生产运行脚本：构建 Docker 镜像并以容器运行（使用根目录 Dockerfile）
  * @param {runProdParamsType} options - 运行配置对象
@@ -24,8 +17,8 @@ function runProd(options: runProdParamsType = {}) {
   // 构建镜像
   exec(`docker build -t ${tag} .`)
   // 清理同名容器
-  if (containerExistsCompat(containerName)) {
-    pipeExec(`docker rm -f ${containerName}`);
+  if (containerExists({ name: containerName })) {
+    pipeExec(`docker rm -f ${containerName}`)
   }
   // 运行容器（依赖外部 DB，通过 .env 提供 DATABASE_URL）
   exec(

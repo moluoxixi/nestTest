@@ -1,12 +1,11 @@
 import { ensureDockerDesktop } from './utils/docker'
 import { exec } from './utils/exec'
 import type { runDevParamsType } from './_types/run.dev'
-
-
+ 
 /**
  * 启动开发环境脚本：在 Docker 启动数据库后，启动 Nest 开发服务
  * @param {runDevParamsType} options - 运行配置对象
- * @param {boolean} [options.startServer=true] - 是否在 DB 启动后启动 Nest 开发服务
+ * @param {boolean} options.startServer - 是否在 DB 启动后启动 Nest 开发服务
  */
 function runDev(options: runDevParamsType = {}) {
   const { startServer = true } = options
