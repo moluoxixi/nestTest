@@ -1,1 +1,1 @@
-写脚本时，使用shell脚本，禁止使用powershell脚本。
+写脚本时，使用ts写node脚本，使用tsx执行，禁止使用powershell，shell脚本，脚本写完后，需要运行进行测试。
