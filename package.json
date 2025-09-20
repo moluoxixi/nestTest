@@ -40,8 +40,8 @@
     "build": "nest build",
     "start:debug": "nest start --debug --watch",
     "start:db": "npm run migrate:up && npm run prisma:generate && npm run seed",
-    "start:dev": "nest start --watch",
-    "start:prod": "node dist/main"
+    "start:dev": "tsx ./scripts/run.dev.mts",
+    "start:prod": "tsx ./scripts/run.prod.mts"
   },
   "dependencies": {
     "@apollo/server": "^4.7.5",
@@ -57,7 +57,7 @@
     "@nestjs/platform-express": "10.1.0",
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "7.1.2",
-    "@prisma/client": "^6.16.2",
+    "@prisma/client": "^5.0.0",
     "bcrypt": "5.1.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
@@ -85,7 +85,7 @@
     "eslint-plugin-format": "^1.0.1",
     "jiti": "^2.4.2",
     "prettier": "2.8.8",
-    "prisma": "^6.16.2",
+    "prisma": "^5.0.0",
     "prisma-dbml-generator": "0.11.0-dev.0",
     "ts-loader": "9.4.4",
     "ts-node": "10.9.1",
