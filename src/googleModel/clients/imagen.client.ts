@@ -21,7 +21,7 @@ export class Imagen {
     if (files.length === 0)
       throw new Error('No generated images returned')
 
-    // 保存到 dist/google/files
+    // 保存到 dist/googleModel/files
     const defaultDir = resolve(process.cwd(), 'public', 'files')
     await mkdir(defaultDir, { recursive: true })
 

@@ -1,10 +1,10 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
-import { GoogleService } from '../google.service'
+import { GoogleModelService } from '../googleModel.service'
 
-@Controller('imagen')
+@Controller('googleModel/imagen')
 export class ImagenController {
-  constructor(private readonly google: GoogleService) {}
+  constructor(private readonly google: GoogleModelService) {}
 
   @Post('generateImages')
   async generateImages(@Req() req: Request, @Body() body: { apiKey: string, prompt?: string, model?: string }) {

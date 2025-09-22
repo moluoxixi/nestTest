@@ -9,7 +9,7 @@ import config from './common/configs/config'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 
 import { GqlConfigService } from './gql-config.service'
-import { GoogleModule } from './google/google.module'
+import { GoogleModelModule } from './googleModel/googleModel.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'node:path'
 
@@ -42,7 +42,7 @@ import { join } from 'node:path'
     AuthModule,
     UsersModule,
     PostsModule,
-    GoogleModule,
+    GoogleModelModule,
   ],
 })
 export class AppModule {}

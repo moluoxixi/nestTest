@@ -3,7 +3,7 @@ import createGoogleModels from './clients'
 import { join } from 'node:path'
 
 @Injectable()
-export class GoogleService {
+export class GoogleModelService {
   getClient(apiKey: string) {
     return createGoogleModels(apiKey)
   }
@@ -13,3 +13,5 @@ export class GoogleService {
     return join(process.cwd(), 'public', 'files', name)
   }
 }
+
+
