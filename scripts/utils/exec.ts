@@ -18,4 +18,18 @@ export function pipeExec(command: commandStringType = '') {
   execSync(command, { stdio: 'pipe', cwd: resolve(process.cwd()) })
 }
 
+/**
+ * 同步执行命令并返回 stdout 字符串（UTF-8）
+ * @param {commandStringType} command - 要执行的命令
+ * @returns {string} 标准输出内容（去除结尾换行）
+ */
+export function execCapture(command: commandStringType = ''): string {
+  const result = execSync(command, {
+    stdio: ['ignore', 'pipe', 'ignore'],
+    cwd: resolve(process.cwd()),
+    encoding: 'utf-8',
+  }) as unknown as string
+  return typeof result === 'string' ? result : String(result)
+}
+
 

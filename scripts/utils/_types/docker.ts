@@ -8,4 +8,10 @@ export type containerExistsParamsType = {
   name?: string
 }
 
+export type dockerLoginParamsType = {
+  registry?: string
+  username?: string
+  password?: string
+}
+
 
