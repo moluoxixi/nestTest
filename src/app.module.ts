@@ -12,6 +12,7 @@ import { GqlConfigService } from './gql-config.service'
 import { GoogleModelModule } from './googleModel/googleModel.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { JianYingModule } from './jianying/jianying.module'
+import { VideosModule } from './videos/videos.module'
 import { join } from 'node:path'
 
 @Module({
@@ -44,6 +45,7 @@ import { join } from 'node:path'
     UsersModule,
     PostsModule,
     GoogleModelModule,
+    VideosModule,
     JianYingModule,
   ],
 })
