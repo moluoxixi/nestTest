@@ -6,10 +6,10 @@ export interface veoGenerateVideosParamsType {
   prompt?: string
 
   /**
-   * Veo 模型 ID（默认 `"veo-3.0-generate-001"`）。
+   * Veo 模型 ID（默认 `"veo-3.0-generate-preview"`）。
    * 可选：`"veo-3.0-fast-generate-001"`、`"veo-2.0-generate-001"`，或将来新增的版本字符串。
    */
-  model?: 'veo-3.0-generate-001' | 'veo-3.0-fast-generate-001' | 'veo-2.0-generate-001' | string
+  model?: 'veo-3.0-generate-preview' | 'veo-3.0-fast-generate-001' | 'veo-2.0-generate-001' | string
 
   /**
    * 轮询等待生成完成的间隔（毫秒）。服务端内部使用，默认 10000。
@@ -27,11 +27,6 @@ export interface veoGenerateVideosParamsType {
   personGeneration?: 'dont_allow' | 'allow_adult'
 
   /**
-   * 目标视频时长（秒）。Veo 3 常见为 8 秒。
-   */
-  durationSeconds?: number
-
-  /**
    * 分辨率（如 `"720p"`、`"1080p"`）。
    */
   resolution?: '720p' | '1080p' | string
@@ -40,26 +35,6 @@ export interface veoGenerateVideosParamsType {
    * 纵横比（如 `"16:9"`、`"9:16"`）。
    */
   aspectRatio?: '16:9' | '9:16' | string
-
-  /**
-   * 音轨设置：`"auto"`（模型自动/包含音频）或 `"none"`（不包含音频）。
-   */
-  soundtrack?: 'auto' | 'none' | string
-
-  /**
-   * 图片地址数组（URL）。当提供时，将把这些图片作为视频生成的参考/上下文图片上传并传入模型。
-   */
-  imageUrls?: string[]
-
-  /**
-   * 图片 base64 字符串数组。支持 data URL（如 `data:image/png;base64,xxx`）或纯 base64 字符串。
-   */
-  imageBase64?: string[]
-
-  /**
-   * 当 `imageBase64` 为纯 base64（非 data URL）时用于指明 MIME 类型，默认 `image/png`。
-   */
-  imageMimeType?: string
 
   /** 其他可选参数，直接透传到底层 SDK（前向兼容）。 */
   [k: string]: unknown

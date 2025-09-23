@@ -16,7 +16,7 @@ export class VeoController {
    * @param {object} body - 请求体参数
    * @param {string} body.apiKey - Gemini API Key
    * @param {string} body.prompt - 文本提示
-   * @param {string} [body.model] - 模型 ID，默认 `veo-3.0-generate-001`
+   * @param {string} [body.model] - 模型 ID，默认 `veo-3.0-generate-preview`
    * @param {number} [body.pollIntervalMs] - 轮询间隔（毫秒），默认 10000
    * @param {('dont_allow'|'allow_adult')} [body.personGeneration] - 人像生成策略（地区限制）
    * @param {number} [body.durationSeconds] - 视频时长（秒）
@@ -49,7 +49,7 @@ export class VeoController {
     try {
       const downloadPath = this.google.buildDownloadPath('video', 'mp4')
       const client = this.google.getClient(body.apiKey)
-      const { model = 'veo-3.0-generate-001', prompt, pollIntervalMs, ...rest } = body || {}
+      const { model = 'veo-3.0-generate-preview', prompt, pollIntervalMs, ...rest } = body || {}
       const result = await client.veoGenerateVideos({
         prompt,
         model,
