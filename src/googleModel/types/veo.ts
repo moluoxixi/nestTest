@@ -26,10 +26,6 @@ export interface veoGenerateVideosParamsType {
    */
   personGeneration?: 'dont_allow' | 'allow_adult'
 
-  /**
-   * 分辨率（如 `"720p"`、`"1080p"`）。
-   */
-  resolution?: '720p' | '1080p' | string
 
   /**
    * 纵横比（如 `"16:9"`、`"9:16"`）。
@@ -46,5 +42,36 @@ export interface veoGenerateVideosResultType {
   /** 完整的响应对象（包含 generatedVideos 等）。 */
   response?: any
 }
+/**
+ * 测试写入接口入参类型。
+ */
+export interface veoTestWriteParamsType {
+  /**
+   * 生成文件名前缀，仅支持与服务方法一致的三种前缀。
+   * - 用于 `GoogleModelService.buildDownloadPath(prefix, ext)`。
+   */
+  prefix?: 'video' | 'image' | 'audio'
+  /**
+   * 文件扩展名（不带点）。
+   */
+  ext?: string
+  /**
+   * 要写入文件中的内容（纯文本）。
+   */
+  content?: string
+}
 
+/**
+ * 测试写入接口返回类型。
+ */
+export interface veoTestWriteResultType {
+  /**
+   * 写入后的绝对路径（容器内或本机进程的 CWD 下）。
+   */
+  absPath: string
+  /**
+   * 可通过 HTTP 访问的下载地址（由静态资源模块提供）。
+   */
+  downPath: string
+}
 

@@ -25,7 +25,6 @@ export class Veo {
    * @param {string} [options.downloadPath] - 本地下载保存路径
    * @param {('dont_allow'|'allow_adult')} [options.personGeneration] - 人像生成策略
    * @param {number} [options.durationSeconds] - 视频时长（秒）
-   * @param {('720p'|'1080p'|string)} [options.resolution] - 分辨率
    * @param {('16:9'|'9:16'|string)} [options.aspectRatio] - 纵横比
    * @returns {Promise<veoGenerateVideosResultType>} 返回文件句柄与完整响应
    */
@@ -36,7 +35,6 @@ export class Veo {
       pollIntervalMs = 10000,
       downloadPath,
       personGeneration,
-      resolution = '1080p',
       aspectRatio = '16:9',
       ...rest
     } = options
@@ -47,7 +45,6 @@ export class Veo {
       prompt,
       config: {
         personGeneration,
-        resolution,
         aspectRatio,
         ...rest,
       },
