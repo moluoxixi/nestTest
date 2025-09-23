@@ -22,6 +22,7 @@ export class Veo {
    * @param {string} [options.prompt] - 文本提示，描述生成内容
    * @param {string} [options.model="veo-3.0-generate-preview"] - Veo 模型 ID
    * @param {number} [options.pollIntervalMs=10000] - 轮询间隔（毫秒）
+   * @param {('720p'|'1080p')} [options.resolution='1080p'] - 输出分辨率
    * @param {string} [options.downloadPath] - 本地下载保存路径
    * @param {('dont_allow'|'allow_adult')} [options.personGeneration] - 人像生成策略
    * @param {number} [options.durationSeconds] - 视频时长（秒）

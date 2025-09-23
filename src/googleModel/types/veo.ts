@@ -17,6 +17,13 @@ export interface veoGenerateVideosParamsType {
   pollIntervalMs?: number
 
   /**
+   * 输出分辨率，仅支持 `"720p"` 或 `"1080p"`。
+   * - 默认值：`"1080p"`
+   * - 该字段会直接传递给 Veo 模型的 `resolution` 参数。
+   */
+  resolution?: '720p' | '1080p'
+
+  /**
    * 下载保存路径（含文件名）。若不提供，会在 `public/files` 生成随机文件名。
    */
   downloadPath?: string

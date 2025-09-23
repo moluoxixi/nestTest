@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common'
+import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { GoogleModelService } from '../googleModel.service'
 import { writeFile } from 'node:fs/promises'
@@ -19,6 +19,7 @@ export class VeoController {
    * @param {string} [body.model] - 模型 ID，默认 `veo-3.0-generate-preview`
    * @param {number} [body.pollIntervalMs] - 轮询间隔（毫秒），默认 10000
    * @param {('dont_allow'|'allow_adult')} [body.personGeneration] - 人像生成策略（地区限制）
+   * @param {('720p'|'1080p')} [body.resolution='1080p'] - 输出分辨率
    * @param {('16:9'|'9:16'|string)} [body.aspectRatio] - 纵横比
    */
   @Post('generateVideos')
@@ -29,6 +30,7 @@ export class VeoController {
       prompt: string
       model?: string
       pollIntervalMs?: number
+      resolution?: '720p' | '1080p'
       personGeneration?: 'dont_allow' | 'allow_adult'
       aspectRatio?: '16:9' | '9:16' | string
       [k: string]: unknown
