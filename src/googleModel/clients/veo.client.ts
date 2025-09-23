@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai'
+import { Buffer } from 'node:buffer'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '../types/veo'
@@ -23,6 +24,7 @@ export class Veo {
    * @param {string} [options.model="veo-3.0-generate-preview"] - Veo 模型 ID
    * @param {number} [options.pollIntervalMs=10000] - 轮询间隔（毫秒）
    * @param {('720p'|'1080p')} [options.resolution='1080p'] - 输出分辨率
+   * @param {string} [options.imageUrl] - 参考图像地址（http/https 或 base64），将作为 image 传入
    * @param {string} [options.downloadPath] - 本地下载保存路径
    * @param {('dont_allow'|'allow_adult')} [options.personGeneration] - 人像生成策略
    * @param {number} [options.durationSeconds] - 视频时长（秒）
@@ -38,14 +40,38 @@ export class Veo {
       downloadPath,
       personGeneration,
       aspectRatio = '16:9',
+      imageUrl,
       ...rest
     } = options
 
-    // 调用 SDK，传入 prompt 与 images（如支持），并透传扩展参数
+    // 将 imageUrl 处理为 { imageBytes, mimeType }
+    let image: any | undefined
+    if (imageUrl && typeof imageUrl === 'string') {
+      const dataUrlMatch = imageUrl.match(/^data:(.*?);base64,(.*)$/i)
+      if (dataUrlMatch) {
+        const mime = dataUrlMatch[1] || 'image/png'
+        const base64 = dataUrlMatch[2]
+        image = { imageBytes: base64, mimeType: mime }
+      }
+      else if (/^https?:\/\//i.test(imageUrl)) {
+        const res = await fetch(imageUrl)
+        const mime = res.headers.get('content-type') || 'image/png'
+        const arrBuf = await res.arrayBuffer()
+        const base64 = Buffer.from(arrBuf).toString('base64')
+        image = { imageBytes: base64, mimeType: mime }
+      }
+      else {
+        // 纯 base64（可能不带 data: 前缀）
+        image = { imageBytes: imageUrl, mimeType: 'image/png' }
+      }
+    }
+
+    // 调用 SDK，传入 prompt 与 image（如有），并透传扩展参数
     let operation = await this.ai.models.generateVideos({
       model,
       prompt,
       resolution,
+      image,
       config: {
         personGeneration,
         aspectRatio,

@@ -20,6 +20,7 @@ export class VeoController {
    * @param {number} [body.pollIntervalMs] - 轮询间隔（毫秒），默认 10000
    * @param {('dont_allow'|'allow_adult')} [body.personGeneration] - 人像生成策略（地区限制）
    * @param {('720p'|'1080p')} [body.resolution='1080p'] - 输出分辨率
+   * @param {string} [body.imageUrl] - 参考图像地址（http/https 或 base64），转换后以 image 传入
    * @param {('16:9'|'9:16'|string)} [body.aspectRatio] - 纵横比
    */
   @Post('generateVideos')
@@ -31,6 +32,7 @@ export class VeoController {
       model?: string
       pollIntervalMs?: number
       resolution?: '720p' | '1080p'
+      imageUrl?: string
       personGeneration?: 'dont_allow' | 'allow_adult'
       aspectRatio?: '16:9' | '9:16' | string
       [k: string]: unknown

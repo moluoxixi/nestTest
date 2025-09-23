@@ -24,6 +24,15 @@ export interface veoGenerateVideosParamsType {
   resolution?: '720p' | '1080p'
 
   /**
+   * 可选的参考图像地址，用于引导视频生成。
+   * - 支持两种形式：
+   *   1) 传统 URL（http/https），将会下载后转为 base64
+   *   2) base64 字符串（可带 data: 前缀或纯 base64 内容）
+   * - 处理后将作为 `image: { imageBytes, mimeType }` 传递给 `generateVideos`
+   */
+  imageUrl?: string
+
+  /**
    * 下载保存路径（含文件名）。若不提供，会在 `public/files` 生成随机文件名。
    */
   downloadPath?: string
