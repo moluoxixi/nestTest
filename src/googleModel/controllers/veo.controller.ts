@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { GoogleModelService } from '../googleModel.service'
 
@@ -26,6 +26,9 @@ export class VeoController {
    * @param {('720p'|'1080p'|string)} [body.resolution] - 分辨率
    * @param {('16:9'|'9:16'|string)} [body.aspectRatio] - 纵横比
    * @param {('auto'|'none'|string)} [body.soundtrack] - 音轨策略
+   * @param {string[]} [body.imageUrls] - 参考图片 URL 列表
+   * @param {string[]} [body.imageBase64] - 参考图片 base64 列表（可为 data URL）
+   * @param {string} [body.imageMimeType] - 当 base64 非 data URL 时的 MIME 类型（默认 image/png）
    */
   @Post('generateVideos')
   async generateVideos(
@@ -40,26 +43,32 @@ export class VeoController {
       resolution?: '720p' | '1080p' | string
       aspectRatio?: '16:9' | '9:16' | string
       soundtrack?: 'auto' | 'none' | string
+      imageUrls?: string[]
+      imageBase64?: string[]
+      imageMimeType?: string
       [k: string]: unknown
     },
   ) {
-    const downloadPath = this.google.buildDownloadPath('video', 'mp4')
-    const client = this.google.getClient(body.apiKey)
-    const { model = 'veo-3.0-generate-001', prompt, pollIntervalMs, ...rest } = body || {}
-    const res = await client.veoGenerateVideos({
-      prompt,
-      model,
-      pollIntervalMs,
-      downloadPath,
-      ...rest,
-    })
-    const filename = downloadPath.replace(/\\/g, '/').split('/').pop()
-    const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
-    const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
-    const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
-    return {
-      downPath,
-      file: res.file,
+    try {
+      const downloadPath = this.google.buildDownloadPath('video', 'mp4')
+      const client = this.google.getClient(body.apiKey)
+      const { model = 'veo-3.0-generate-001', prompt, pollIntervalMs, ...rest } = body || {}
+      await client.veoGenerateVideos({
+        prompt,
+        model,
+        pollIntervalMs,
+        downloadPath,
+        ...rest,
+      })
+      const filename = downloadPath.replace(/\\/g, '/').split('/').pop()
+      const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
+      const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
+      const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
+      const downPaths: string[] = [downPath]
+      return { downPaths, message: '' }
+    }
+    catch (e: any) {
+      return { downPaths: [], message: e?.message || 'Veo generateVideos failed' }
     }
   }
 }

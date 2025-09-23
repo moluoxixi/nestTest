@@ -41,13 +41,35 @@ export class Veo {
       resolution,
       aspectRatio,
       soundtrack,
+      imageUrls,
+      imageBase64,
+      imageMimeType = 'image/png',
       ...rest
     } = options
 
-    // 调用 SDK，透传扩展参数，便于前向兼容
+    // 预处理图片输入：将 URL 和 Base64 上传为 file 引用
+    const files: any[] = []
+    if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+      for (const url of imageUrls) {
+        // 使用 Files.upload 以 URL 形式上传/引用（SDK 支持 URL 或需先 fetch，再上传；这里直接透传 URL）
+        files.push({ uri: url })
+      }
+    }
+    if (Array.isArray(imageBase64) && imageBase64.length > 0) {
+      for (const b64 of imageBase64) {
+        const isDataUrl = /^data:/i.test(b64)
+        const upload = isDataUrl
+          ? { dataUrl: b64 }
+          : { inlineData: { data: b64, mimeType: imageMimeType || 'image/png' } }
+        files.push(upload)
+      }
+    }
+
+    // 调用 SDK，传入 prompt 与 images（如支持），并透传扩展参数
     let operation = await this.ai.models.generateVideos({
       model,
       prompt,
+      images: files.length ? files : undefined,
       personGeneration,
       durationSeconds,
       resolution,

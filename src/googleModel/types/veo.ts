@@ -46,6 +46,21 @@ export interface veoGenerateVideosParamsType {
    */
   soundtrack?: 'auto' | 'none' | string
 
+  /**
+   * 图片地址数组（URL）。当提供时，将把这些图片作为视频生成的参考/上下文图片上传并传入模型。
+   */
+  imageUrls?: string[]
+
+  /**
+   * 图片 base64 字符串数组。支持 data URL（如 `data:image/png;base64,xxx`）或纯 base64 字符串。
+   */
+  imageBase64?: string[]
+
+  /**
+   * 当 `imageBase64` 为纯 base64（非 data URL）时用于指明 MIME 类型，默认 `image/png`。
+   */
+  imageMimeType?: string
+
   /** 其他可选参数，直接透传到底层 SDK（前向兼容）。 */
   [k: string]: unknown
 }

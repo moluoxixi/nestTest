@@ -12,10 +12,40 @@ export class Imagen {
 
   /**
    * imagenGenerateImages → 对应接口：/imagen/generateImages
+   * 参考：`https://ai.google.dev/gemini-api/docs/imagen?hl=zh-cn#imagen-configuration`
+   *
+   * @param {imagenGenerateImagesParamsType} options - 参数对象
+   * @param {string} [options.prompt] - 文本提示
+   * @param {string} [options.model] - 模型 ID（默认为 imagen-3.0-generate-002 或 4.x）
+   * @param {string} [options.downloadPath] - 下载保存路径（单图或作为多图前缀）
+   * @param {number} [options.numberOfImages] - 生成张数（1-4）
+   * @param {('1K'|'2K')} [options.sampleImageSize] - 图片尺寸（Standard/Ultra）
+   * @param {('1:1'|'3:4'|'4:3'|'9:16'|'16:9')} [options.aspectRatio] - 宽高比
+   * @param {('dont_allow'|'allow_adult'|'allow_all')} [options.personGeneration] - 人像生成策略
+   * @returns {Promise<imagenGenerateImagesResultType>} 图片文件句柄与完整响应
    */
   async imagenGenerateImages(options: imagenGenerateImagesParamsType = {}): Promise<imagenGenerateImagesResultType> {
-    const { prompt, model = 'imagen-3.0-generate-001', downloadPath } = options
-    const res = await this.ai.models.generateImages({ model, prompt })
+    const {
+      prompt,
+      model = 'imagen-3.0-generate-002',
+      downloadPath,
+      numberOfImages,
+      sampleImageSize,
+      aspectRatio,
+      personGeneration,
+      ...rest
+    } = options
+    const res = await this.ai.models.generateImages({
+      model,
+      prompt,
+      config: {
+        numberOfImages,
+        sampleImageSize,
+        aspectRatio,
+        personGeneration,
+      },
+      ...rest,
+    })
 
     const files = res.response?.generatedImages?.map((g: any) => g.image) || []
     if (files.length === 0)

@@ -11,6 +11,8 @@ services:
       - postgres
     env_file:
       - .env
+    volumes:
+      - ./public:/app/public
 
   postgres:
     image: postgres:15
