@@ -36,8 +36,8 @@ export class Veo {
       pollIntervalMs = 10000,
       downloadPath,
       personGeneration,
-      resolution,
-      aspectRatio,
+      resolution = '1080p',
+      aspectRatio = '16:9',
       ...rest
     } = options
 
