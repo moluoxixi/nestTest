@@ -11,6 +11,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { GqlConfigService } from './gql-config.service'
 import { GoogleModelModule } from './googleModel/googleModel.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { JianYingModule } from './jianying/jianying.module'
 import { join } from 'node:path'
 
 @Module({
@@ -43,6 +44,7 @@ import { join } from 'node:path'
     UsersModule,
     PostsModule,
     GoogleModelModule,
+    JianYingModule,
   ],
 })
 export class AppModule {}
