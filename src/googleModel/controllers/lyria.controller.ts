@@ -49,7 +49,7 @@ export class LyriaController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
       const downPaths: string[] = [downPath]
-      return { downPaths }
+      return { downPaths, response: result }
     }
     catch (e: any) {
       // 先返回占位 downPaths，同时反馈说明

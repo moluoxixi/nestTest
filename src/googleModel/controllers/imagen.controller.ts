@@ -50,7 +50,7 @@ export class ImagenController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const absolute = host ? `${proto}://${host}${relative}` : relative
       const downPaths: string[] = [absolute]
-      return { downPaths, response: result?.response }
+      return { downPaths, response: result }
     }
     catch (e: any) {
       return { downPaths: [], response: undefined, error: (e?.message ?? e) }

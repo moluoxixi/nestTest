@@ -50,7 +50,7 @@ export class VeoController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
       const downPaths: string[] = [downPath]
-      return { downPaths, response: result?.response }
+      return { downPaths, response: result }
     }
     catch (e: any) {
       return { downPaths: [], response: undefined, error: (e?.message ?? e) }
