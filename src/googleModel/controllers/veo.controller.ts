@@ -19,13 +19,8 @@ export class VeoController {
    * @param {string} [body.model] - 模型 ID，默认 `veo-3.0-generate-preview`
    * @param {number} [body.pollIntervalMs] - 轮询间隔（毫秒），默认 10000
    * @param {('dont_allow'|'allow_adult')} [body.personGeneration] - 人像生成策略（地区限制）
-   * @param {number} [body.durationSeconds] - 视频时长（秒）
    * @param {('720p'|'1080p'|string)} [body.resolution] - 分辨率
    * @param {('16:9'|'9:16'|string)} [body.aspectRatio] - 纵横比
-   * @param {('auto'|'none'|string)} [body.soundtrack] - 音轨策略
-   * @param {string[]} [body.imageUrls] - 参考图片 URL 列表
-   * @param {string[]} [body.imageBase64] - 参考图片 base64 列表（可为 data URL）
-   * @param {string} [body.imageMimeType] - 当 base64 非 data URL 时的 MIME 类型（默认 image/png）
    */
   @Post('generateVideos')
   async generateVideos(
@@ -36,13 +31,8 @@ export class VeoController {
       model?: string
       pollIntervalMs?: number
       personGeneration?: 'dont_allow' | 'allow_adult'
-      durationSeconds?: number
       resolution?: '720p' | '1080p' | string
       aspectRatio?: '16:9' | '9:16' | string
-      soundtrack?: 'auto' | 'none' | string
-      imageUrls?: string[]
-      imageBase64?: string[]
-      imageMimeType?: string
       [k: string]: unknown
     },
   ) {
