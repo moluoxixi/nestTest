@@ -39,7 +39,7 @@ export class ImagenController {
       const baseWithoutExt = basePath.replace(/\.(png|jpg|jpeg|webp)$/i, '')
       const client = this.google.getClient(body.apiKey)
       const { model, prompt, ...rest } = body || {}
-      await client.imagenGenerateImages({
+      const result = await client.imagenGenerateImages({
         prompt,
         model,
         downloadPath: `${baseWithoutExt}.png`,
@@ -50,10 +50,10 @@ export class ImagenController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const absolute = host ? `${proto}://${host}${relative}` : relative
       const downPaths: string[] = [absolute]
-      return { downPaths, message: '' }
+      return { downPaths, response: result?.response }
     }
     catch (e: any) {
-      return { downPaths: [], message: e?.message || 'Imagen generateImages failed' }
+      return { downPaths: [], response: undefined, error: (e?.message ?? e) }
     }
   }
 }

@@ -2,6 +2,8 @@ import { containerExists, dockerLogin, ensureDockerDesktop } from './utils/docke
 import { exec, pipeExec } from './utils/exec'
 import type { runProdParamsType } from './_types'
 import { loadEnvFromFile } from './utils/env'
+import { mkdir } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
 /**
  * 生产运行脚本：构建 Docker 镜像并以容器运行（使用根目录 Dockerfile）
@@ -34,6 +36,11 @@ function runProd(options: runProdParamsType = {}) {
 
   const actualContainerName = containerName || tag
 
+  // 确保宿主机静态目录存在（用于卷挂载持久化生成文件）
+  const hostPublicDir = resolve(process.cwd(), 'public')
+  const hostFilesDir = resolve(hostPublicDir, 'files')
+  mkdir(hostFilesDir, { recursive: true }).catch(() => {})
+
   // 构建镜像：
   // - 始终构建本地 tag（便于本地运行）
   exec(`docker build -t ${tag} .`)
@@ -42,8 +49,12 @@ function runProd(options: runProdParamsType = {}) {
     pipeExec(`docker rm -f ${actualContainerName}`)
   }
   // 运行容器（依赖外部 DB，通过 .env 提供 DATABASE_URL）
+  // - 映射端口到 3000（应用默认端口）
+  // - 将宿主机 ./public 挂载到容器 /app/public，便于持久化与对外静态访问
+  const volumeFlag = `-v "${hostPublicDir}:/app/public"`
+  console.log('hostPublicDir',hostPublicDir);
   exec(
-    `docker run -d -t --name ${actualContainerName} -p 4000:4000 --env-file .env ${tag}`,
+    `docker run -d -t --name ${actualContainerName} -p 4000:4000 ${volumeFlag} --env-file .env ${tag}`,
   )
 
   // 如需推送到远端仓库（仅推送 latest 标签）

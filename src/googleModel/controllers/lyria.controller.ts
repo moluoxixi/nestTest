@@ -37,7 +37,7 @@ export class LyriaController {
     const client = this.google.getClient(body.apiKey)
     try {
       const { model = 'models/lyria-realtime-exp', prompt, pollIntervalMs, ...rest } = body || {}
-      await client.lyriaGenerateMusic({
+      const result = await client.lyriaGenerateMusic({
         prompt,
         model,
         pollIntervalMs,
@@ -49,7 +49,7 @@ export class LyriaController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
       const downPaths: string[] = [downPath]
-      return { downPaths, message: '' }
+      return { downPaths }
     }
     catch (e: any) {
       // 先返回占位 downPaths，同时反馈说明
@@ -58,7 +58,7 @@ export class LyriaController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
       const message = e?.message || 'Lyria music generation is not implemented in client.'
-      return { downPaths: [downPath], message }
+      return { downPaths: [downPath], response: undefined, error: (e?.message ?? e) }
     }
   }
 }

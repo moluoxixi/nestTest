@@ -1,15 +1,12 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { GoogleModelService } from '../googleModel.service'
+import { writeFile } from 'node:fs/promises'
+import { veoTestWriteParamsType, veoTestWriteResultType } from '../_types/veo'
 
 @Controller('googleModel/veo')
 export class VeoController {
   constructor(private readonly google: GoogleModelService) {}
-
-  @Get('hello/:name')
-  getHelloName(@Param('name') name: string): string {
-    return `Hello ${name}!`
-  }
 
   /**
    * 生成视频（Veo 3 / Veo 3 Fast / Veo 2）
@@ -53,7 +50,7 @@ export class VeoController {
       const downloadPath = this.google.buildDownloadPath('video', 'mp4')
       const client = this.google.getClient(body.apiKey)
       const { model = 'veo-3.0-generate-001', prompt, pollIntervalMs, ...rest } = body || {}
-      await client.veoGenerateVideos({
+      const result = await client.veoGenerateVideos({
         prompt,
         model,
         pollIntervalMs,
@@ -65,10 +62,30 @@ export class VeoController {
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
       const downPaths: string[] = [downPath]
-      return { downPaths, message: '' }
+      return { downPaths, response: result?.response }
     }
     catch (e: any) {
-      return { downPaths: [], message: e?.message || 'Veo generateVideos failed' }
+      return { downPaths: [], response: undefined, error: (e?.message ?? e) }
     }
+  }
+
+  /**
+   * 测试接口：在 `public/files` 写入一个文本文件
+   * - 目的：验证容器/进程的输出是否落盘到静态目录，并可被静态资源模块正确访问
+   * - 路径：POST /googleModel/veo/testWrite
+   */
+  @Post('testWrite')
+  async testWrite(
+    @Req() req: Request,
+    @Body() body: veoTestWriteParamsType = {},
+  ): Promise<veoTestWriteResultType> {
+    const { prefix = 'video', ext = 'txt', content = 'ok' } = body
+    const filePath = this.google.buildDownloadPath(prefix, ext)
+    await writeFile(filePath, String(content ?? ''))
+    const filename = filePath.replace(/\\/g, '/').split('/').pop() as string
+    const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
+    const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
+    const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
+    return { absPath: filePath, downPath }
   }
 }
