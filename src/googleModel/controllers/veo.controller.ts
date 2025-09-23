@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { GoogleModelService } from '../googleModel.service'
-import { VideosService } from '../../Videos/videos.service'
+import { VideosService } from '../../videos/videos.service'
 import { writeFile } from 'node:fs/promises'
 import { veoTestWriteParamsType, veoTestWriteResultType } from '../types/veo'
 
