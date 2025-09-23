@@ -1,12 +1,13 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { GoogleModelService } from '../googleModel.service'
+import { VideosService } from '../../Videos/videos.service'
 import { writeFile } from 'node:fs/promises'
 import { veoTestWriteParamsType, veoTestWriteResultType } from '../types/veo'
 
 @Controller('googleModel/veo')
 export class VeoController {
-  constructor(private readonly google: GoogleModelService) {}
+  constructor(private readonly google: GoogleModelService, private readonly videos: VideosService) {}
 
   /**
    * 生成视频（Veo 3 / Veo 3 Fast / Veo 2）
@@ -49,12 +50,28 @@ export class VeoController {
         downloadPath,
         ...rest,
       })
+      // 生成首尾帧图片（调用独立 VideosService，直接获得相对 URL）
+      const base = downloadPath.replace(/\.(mp4|mov|mkv)$/i, '')
+      const firstPic = `${base}_first.jpg`
+      const lastPic = `${base}_last.jpg`
+      const { firstAbs, lastAbs } = await this.videos.extractFrames({
+        input: downloadPath,
+        firstName: firstPic.replace(/\\/g, '/').split('/').pop(),
+        lastName: lastPic.replace(/\\/g, '/').split('/').pop(),
+        lastOffsetMs: 100,
+      })
+
       const filename = downloadPath.replace(/\\/g, '/').split('/').pop()
       const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
+      const toRel = (abs: string) => `/files/${abs.replace(/\\/g, '/').split('/').pop()}`
+      const firstRelUrl = toRel(firstAbs)
+      const lastRelUrl = toRel(lastAbs)
+      const firstAbsUrl = host ? `${proto}://${host}${firstRelUrl}` : firstRelUrl
+      const lastAbsUrl = host ? `${proto}://${host}${lastRelUrl}` : lastRelUrl
       const downPaths: string[] = [downPath]
-      return { downPaths, response: result }
+      return { downPaths, firstFrame: firstAbsUrl, lastFrame: lastAbsUrl, response: result }
     }
     catch (e: any) {
       return { downPaths: [], response: undefined, error: (e?.message ?? e) }
