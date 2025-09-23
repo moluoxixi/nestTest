@@ -32,6 +32,7 @@ export class Veo {
     const {
       prompt = '',
       model = 'veo-3.0-generate-preview',
+      resolution = '1080p',
       pollIntervalMs = 10000,
       downloadPath,
       personGeneration,
@@ -43,6 +44,7 @@ export class Veo {
     let operation = await this.ai.models.generateVideos({
       model,
       prompt,
+      resolution,
       config: {
         personGeneration,
         aspectRatio,
