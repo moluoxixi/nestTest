@@ -19,7 +19,7 @@ import { Media } from './media'
 import { MediaVideo } from './mediaVideo'
 import { MediaAudio } from './mediaAudio'
 import { MediaImage } from './mediaImage'
-// import { MediaText } from './mediaText'
+import { MediaText } from './mediaText'
 
 /**
  * 媒体工厂
@@ -65,8 +65,8 @@ export class MediaFactory {
         return new MediaAudio(kwargs)
       case 'MediaImage':
         return new MediaImage(kwargs)
-      // case 'MediaText':
-      //   return new MediaText(kwargs)
+      case 'MediaText':
+        return new MediaText(kwargs)
       default:
         console.log(`暂未实现的媒体类: ${className}`)
         return null
