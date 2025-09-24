@@ -57,8 +57,8 @@ export class LyriaController {
       const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
-      const message = e?.message || 'Lyria music generation is not implemented in client.'
-      return { downPaths: [downPath], response: undefined, error: (e?.message ?? e) }
+      const error = String(e?.message ?? e)
+      return { downPaths: [downPath], response: undefined, error }
     }
   }
 }

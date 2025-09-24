@@ -53,7 +53,8 @@ export class ImagenController {
       return { downPaths, response: result }
     }
     catch (e: any) {
-      return { downPaths: [], response: undefined, error: (e?.message ?? e) }
+      const error = String(e?.message ?? e)
+      return { downPaths: [], response: undefined, error }
     }
   }
 }

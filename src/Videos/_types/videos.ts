@@ -1,9 +1,10 @@
 /**
- * 提取首尾帧入参类型
+ * 提取首尾帧入参类型（单一入参）
+ * - videoUrl: 支持 http/https 链接，或本地文件路径（绝对/相对）
  */
 export interface videosExtractFramesParamsType {
-  /** 输入视频 URL 或本地绝对/相对路径 */
-  input: string
+  /** 输入视频 URL 或本地文件路径 */
+  videoUrl: string
   /** 第一帧输出文件名（相对 public/files） */
   firstName?: string
   /** 最后一帧输出文件名（相对 public/files） */

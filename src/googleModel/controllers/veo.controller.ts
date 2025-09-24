@@ -50,21 +50,22 @@ export class VeoController {
         downloadPath,
         ...rest,
       })
-      // 生成首尾帧图片（调用独立 VideosService，直接获得相对 URL）
-      const base = downloadPath.replace(/\.(mp4|mov|mkv)$/i, '')
-      const firstPic = `${base}_first.jpg`
-      const lastPic = `${base}_last.jpg`
-      const { firstAbs, lastAbs } = await this.videos.extractFrames({
-        input: downloadPath,
-        firstName: firstPic.replace(/\\/g, '/').split('/').pop(),
-        lastName: lastPic.replace(/\\/g, '/').split('/').pop(),
-        lastOffsetMs: 100,
-      })
-
+      // 构造可访问的下载 URL（用于后续 extractFrames 以 URL 下载再提帧，避免容器内路径差异导致 ENOENT）
       const filename = downloadPath.replace(/\\/g, '/').split('/').pop()
       const proto = (req.headers['x-forwarded-proto'] as string) || req.protocol || 'http'
       const host = (req.headers['x-forwarded-host'] as string) || req.get('host')
       const downPath = host ? `${proto}://${host}/files/${filename}` : `/files/${filename}`
+
+      // 生成首尾帧图片（优先使用本地绝对路径，避免网络自调用）
+      const base = downloadPath.replace(/\.(mp4|mov|mkv)$/i, '')
+      const firstPic = `${base}_first.jpg`
+      const lastPic = `${base}_last.jpg`
+      const { firstAbs, lastAbs } = await this.videos.extractFrames({
+        videoUrl: downloadPath,
+        firstName: firstPic.replace(/\\/g, '/').split('/').pop(),
+        lastName: lastPic.replace(/\\/g, '/').split('/').pop(),
+        lastOffsetMs: 100,
+      })
       const toRel = (abs: string) => `/files/${abs.replace(/\\/g, '/').split('/').pop()}`
       const firstRelUrl = toRel(firstAbs)
       const lastRelUrl = toRel(lastAbs)
@@ -74,7 +75,8 @@ export class VeoController {
       return { downPaths, firstFrame: firstAbsUrl, lastFrame: lastAbsUrl, response: result }
     }
     catch (e: any) {
-      return { downPaths: [], response: undefined, error: (e?.message ?? e) }
+      const error = String(e?.message ?? e)
+      return { downPaths: [], response: undefined, error }
     }
   }
 

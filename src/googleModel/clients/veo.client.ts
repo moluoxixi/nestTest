@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { Buffer } from 'node:buffer'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '@/googleModel/types/veo'
 
@@ -13,6 +13,37 @@ export class Veo {
 
   private sleep(ms: number = 0): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  /**
+   * 等待文件写入完成：检测文件大小在短时间内保持稳定
+   * - 至少两次采样大小相同即认为稳定
+   * - 最长等待约 4s（20*200ms）
+   * @param filePath - 目标文件绝对路径
+   */
+  private async waitForFileReady(filePath: string): Promise<void> {
+    let lastSize = -1
+    let stableCount = 0
+    for (let i = 0; i < 20; i++) {
+      try {
+        const s = await stat(filePath)
+        if (!s.isFile() || s.size <= 0)
+          throw new Error('not a non-empty file')
+        if (s.size === lastSize) {
+          stableCount++
+          if (stableCount >= 1) return
+        }
+        else {
+          stableCount = 0
+          lastSize = s.size
+        }
+      }
+      catch {}
+      await this.sleep(200)
+    }
+    const fin = await stat(filePath)
+    if (!fin.isFile() || fin.size <= 0)
+      throw new Error('file not ready: empty or not a file')
   }
 
   /**
@@ -94,6 +125,7 @@ export class Veo {
 
     await mkdir(dirname(finalDownloadPath), { recursive: true })
     await this.ai.files.download({ file: videoFile, downloadPath: finalDownloadPath })
+    await this.waitForFileReady(finalDownloadPath)
 
     return { file: videoFile, response: operation.response }
   }
