@@ -44,6 +44,10 @@ export class Draft {
   private materialsInDraftContent: any;
   /** 草稿元数据库的素材 */
   private materialsInDraftMetaInfo: any;
+  /** 草稿元数据库的视频素材 */
+  private videosMaterialInDraftMetaInfo: any[];
+  /** 草稿元数据库的音频素材 */
+  private audiosMaterialInDraftMetaInfo: any[];
   /** 草稿内容库的轨道 */
   private tracksInDraftContent: any[];
 
@@ -74,12 +78,14 @@ export class Draft {
    * @param mediaFileFullName 媒体文件完整路径
    * @param startAtTrack 在轨道上的开始时间（微秒）
    * @param duration 持续时间（微秒）
+   * @param index 索引（暂未使用）
    * @param options 其他选项
    */
   public addMedia(
     mediaFileFullName: string, 
     startAtTrack = 0, 
     duration = 0, 
+    index = 0, 
     options: AddMediaOptions = {}
   ): void {
     // 为了保持向后兼容，如果第二个参数是对象，则使用新的接口
@@ -210,9 +216,9 @@ export class Draft {
     this.materialsInDraftContent = this.draftContentData.materials;
     this.materialsInDraftMetaInfo = this.draftMetaInfoData.draft_materials;
     
-    // 确保必要的材料类型存在于draft_materials中
-    this.ensureMaterialTypeExists(0); // 视频类型
-    this.ensureMaterialTypeExists(8); // 音频类型
+    // 按照Python版本的逻辑，查找对应type的材料
+    this.videosMaterialInDraftMetaInfo = this.materialsInDraftMetaInfo.find(m => m.type === 0)?.value || [];
+    this.audiosMaterialInDraftMetaInfo = this.materialsInDraftMetaInfo.find(m => m.type === 8)?.value || [];
     
     this.tracksInDraftContent = this.draftContentData.tracks;
   }
@@ -280,42 +286,14 @@ export class Draft {
   }
 
   /**
-   * 确保指定类型的材料项存在于draft_materials中
-   * @param materialType 材料类型
-   */
-  private ensureMaterialTypeExists(materialType: number): void {
-    const exists = this.materialsInDraftMetaInfo.find( (m: { type: number }) => m.type === materialType);
-    if (!exists) {
-      this.materialsInDraftMetaInfo.push({
-        type: materialType,
-        value: [],
-      });
-    }
-  }
-
-  /**
-   * 获取指定类型的材料数组
-   * @param materialType 材料类型
-   * @returns 材料数组
-   */
-  private getMaterialArrayByType(materialType: number): any[] {
-    const material = this.materialsInDraftMetaInfo.find((m: { type: number; }) => m.type === materialType);
-    return material ? material.value : [];
-  }
-
-  /**
    * 添加媒体信息到元数据库
    * @param media 媒体对象
    */
   private addMediaToMetaInfo(media: Media): void {
     if (media.categoryType === 'video') {
-      // 视频和图片都存储在type=0的材料中
-      const videoMaterials = this.getMaterialArrayByType(0);
-      videoMaterials.push(media.dataForMetaInfo);
+      this.videosMaterialInDraftMetaInfo.push(media.dataForMetaInfo);
     } else if (media.categoryType === 'audio') {
-      // 音频存储在type=8的材料中
-      const audioMaterials = this.getMaterialArrayByType(8);
-      audioMaterials.push(media.dataForMetaInfo);
+      this.audiosMaterialInDraftMetaInfo.push(media.dataForMetaInfo);
     }
     // 文本等其他类型暂不添加到元数据库
   }
