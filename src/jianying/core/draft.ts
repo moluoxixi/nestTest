@@ -142,7 +142,7 @@ export function addMedia(
  * @param effectNameOrResourceId 特效的名称或资源ID（内置特效可以使用名称；外置特效直接使用剪映的资源ID）
  * @param start 开始时间，默认0
  * @param duration 持续时间，默认0
- * @param index 索引，默认0
+ * @param _index 索引，默认0
  * @param kwargs 其他参数
  */
 export function addEffect(
@@ -150,7 +150,7 @@ export function addEffect(
   effectNameOrResourceId: string | number,
   start: number = 0,
   duration: number = 0,
-  index: number = 0,
+  _index: number = 0,
   kwargs: any = {},
 ): void {
   const media = new MediaEffect({
