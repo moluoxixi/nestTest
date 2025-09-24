@@ -191,7 +191,7 @@ export abstract class Media {
     }
 
     if (mediaInfo.duration !== undefined) {
-      let duration = mediaInfo.duration * 1000; // 转换为微秒
+      let duration = mediaInfo.duration * 1000000; // 转换为微秒（秒 * 1,000,000）
       
       // 如果设置了截取时间start_in_media，那么duration需要减去start_in_media的时间
       const startInMedia = this.options.start_in_media || 0;

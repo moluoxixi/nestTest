@@ -91,6 +91,9 @@ export class Draft {
 
     // 如果指定了duration，将其添加到options中
     if (duration > 0) {
+      if (typeof options !== 'object' || options === null) {
+        options = {};
+      }
       options.duration = duration;
     }
 
