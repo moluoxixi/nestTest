@@ -16,9 +16,9 @@ import { parse as parseMediaInfo } from '../utils/mediaInfo'
 import { Media } from './media'
 
 // 静态导入所有媒体类（TypeScript不支持动态导入模块名）
-// import { MediaVideo } from './mediaVideo'
+import { MediaVideo } from './mediaVideo'
 import { MediaAudio } from './mediaAudio'
-// import { MediaImage } from './mediaImage'
+import { MediaImage } from './mediaImage'
 // import { MediaText } from './mediaText'
 
 /**
@@ -59,14 +59,14 @@ export class MediaFactory {
   private static createInstance(className: string, kwargs: any): Media | null {
     // TypeScript替代方案：静态类映射
     switch (className) {
-      // case 'MediaVideo':
-      //   return new MediaVideo(kwargs)
+      case 'MediaVideo':
+        return new MediaVideo(kwargs)
       case 'MediaAudio':
         return new MediaAudio(kwargs)
-        // case 'MediaImage':
-        //   return new MediaImage(kwargs)
-        // case 'MediaText':
-        //   return new MediaText(kwargs)
+      case 'MediaImage':
+        return new MediaImage(kwargs)
+      // case 'MediaText':
+      //   return new MediaText(kwargs)
       default:
         console.log(`暂未实现的媒体类: ${className}`)
         return null
