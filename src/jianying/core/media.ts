@@ -93,7 +93,7 @@ export abstract class Media {
    * 4. initBizInfoAfter
    * @param kwargs 初始化参数
    */
-  protected constructor(kwargs: any = {}) {
+  constructor(kwargs: any = {}) {
     // 00. 保存传递进来的kwargs，供后续灵活使用
     this.kwargs = kwargs
 

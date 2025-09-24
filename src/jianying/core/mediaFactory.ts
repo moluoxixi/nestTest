@@ -17,10 +17,9 @@ import { Media } from './media'
 
 // 静态导入所有媒体类（TypeScript不支持动态导入模块名）
 // import { MediaVideo } from './mediaVideo'
-// import { MediaAudio } from './mediaAudio'
+import { MediaAudio } from './mediaAudio'
 // import { MediaImage } from './mediaImage'
 // import { MediaText } from './mediaText'
-// TODO: 等所有媒体类实现后取消注释
 
 /**
  * 媒体工厂
@@ -62,12 +61,12 @@ export class MediaFactory {
     switch (className) {
       // case 'MediaVideo':
       //   return new MediaVideo(kwargs)
-      // case 'MediaAudio':
-      //   return new MediaAudio(kwargs)
-      // case 'MediaImage':
-      //   return new MediaImage(kwargs)
-      // case 'MediaText':
-      //   return new MediaText(kwargs)
+      case 'MediaAudio':
+        return new MediaAudio(kwargs)
+        // case 'MediaImage':
+        //   return new MediaImage(kwargs)
+        // case 'MediaText':
+        //   return new MediaText(kwargs)
       default:
         console.log(`暂未实现的媒体类: ${className}`)
         return null
