@@ -5,7 +5,7 @@
 
 import * as fs from 'node:fs'
 import { v4 as uuidv4 } from 'uuid'
-import { ensureFolderExists } from './dirHelper'
+import { ensureFolderExists } from './fileHelper'
 import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
 import { AnimationData, AnimationTypes, EffectData, TransitionData } from './dataStruct'
 

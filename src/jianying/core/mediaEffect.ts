@@ -34,9 +34,7 @@ export class MediaEffect extends Media {
     const effectData = generateEffectData(effectNameOrResourceId)
     effectData.guid = this.id // 使用Media实例的ID作为特效的GUID
 
-    const effectEntity = getVideoEffect(effectData.guid, effectData.resourceId, effectData.name)
-
-    this.materialDataForContent.video_effects = effectEntity
+    this.materialDataForContent.video_effects = getVideoEffect(effectData.guid, effectData.resourceId, effectData.name)
 
     // 特效的各种业务信息为空。后续供track下的segment使用
     this.materialDataForContent['X.extra_material_refs'] = []

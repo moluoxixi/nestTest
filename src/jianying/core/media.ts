@@ -3,9 +3,9 @@
  * 完全按照Python版本 media.py 实现
  */
 
-import * as path from 'node:path'
 import { generateId } from '../utils/tools'
 import * as template from './template'
+import { getBaseNameNoExtension } from '../utils/fileHelper'
 
 /**
  * 媒体信息接口
@@ -93,7 +93,7 @@ export abstract class Media {
    * 4. initBizInfoAfter
    * @param kwargs 初始化参数
    */
-  constructor(kwargs: any = {}) {
+  protected constructor(kwargs: any = {}) {
     // 00. 保存传递进来的kwargs，供后续灵活使用
     this.kwargs = kwargs
 
@@ -106,7 +106,7 @@ export abstract class Media {
 
     // A.2.10. 加载各种资源的文件名称等基础信息
     const mediaFileFullName = kwargs.mediaFileFullName || ''
-    const mediaBaseNameNoExtension = this.getBaseNameNoExtension(mediaFileFullName)
+    const mediaBaseNameNoExtension = getBaseNameNoExtension(mediaFileFullName)
     this.extraInfo = mediaBaseNameNoExtension
     this.materialName = mediaBaseNameNoExtension
     this.filePath = mediaFileFullName
@@ -271,19 +271,5 @@ export abstract class Media {
     else {
       this.categoryType = this.mediaType
     }
-  }
-
-  /**
-   * 获取文件名（不包含扩展名）
-   * 对应Python的FileHelper.get_base_name_no_extension
-   * @param filePath 文件路径
-   * @returns 不包含扩展名的文件名
-   */
-  private getBaseNameNoExtension(filePath: string): string {
-    if (!filePath)
-      return ''
-    const baseName = path.basename(filePath)
-    const extName = path.extname(baseName)
-    return baseName.replace(extName, '')
   }
 }
