@@ -1,80 +1,150 @@
 /**
  * 工具函数
- * 完全按照Python版本 tools.py 实现
+ * 完全按照Python版本 tools.py 实现，一比一复刻
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'node:fs'
+import { v4 as uuidv4 } from 'uuid'
+import { ensureFolderExists } from './dirHelper'
+import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
+import { AnimationData, AnimationTypes, EffectData, TransitionData } from './dataStruct'
 
 /**
  * 生成uuid
- * @returns UUID字符串（大写）
  */
 export function generateId(): string {
-  return uuidv4().toUpperCase();
+  return uuidv4().toUpperCase()
 }
 
 /**
  * 读取json文件
- * @param filePath 文件路径
- * @returns JSON对象
+ * @param path 文件路径
  */
-export function readJson(filePath: string): any {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(content);
+export function readJson(path: string): any {
+  const content = fs.readFileSync(path, 'utf-8')
+  return JSON.parse(content)
 }
 
 /**
  * 写入json文件
- * @param filePath 文件路径
+ * @param path 文件路径
  * @param data 数据
  */
-export function writeJson(filePath: string, data: any): void {
-  const content = JSON.stringify(data, null, 2);
-  fs.writeFileSync(filePath, content, 'utf-8');
+export function writeJson(path: string, data: any): void {
+  // 给json.dump添加参数 ensure_ascii=false可以保证汉字不被编码
+  const content = JSON.stringify(data, null, 2)
+  fs.writeFileSync(path, content, 'utf-8')
 }
 
 /**
  * 创建文件夹
- * 如果文件夹存在则先删除再创建
  * @param folderPath 文件夹路径
  */
 export function createFolder(folderPath: string): void {
   if (fs.existsSync(folderPath)) {
-    fs.rmSync(folderPath, { recursive: true, force: true });
+    fs.rmSync(folderPath, { recursive: true, force: true })
   }
-  fs.mkdirSync(folderPath, { recursive: true });
+
+  ensureFolderExists(folderPath)
 }
 
 /**
- * 确保文件夹存在（不删除已存在的）
- * @param folderPath 文件夹路径
+ * 生成特效数据
+ * @param nameOrResourceId 特效名称或资源id
  */
-export function ensureFolderExists(folderPath: string): void {
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
+export function generateEffectData(nameOrResourceId: string | number): EffectData {
+  let resourceId = '7012933493663470088' // 缺省的特效资源ID表示小花花特效
+  let name = '小花花'
+
+  if (typeof nameOrResourceId === 'string') {
+    name = nameOrResourceId
+
+    if (name in effectDict) {
+      resourceId = effectDict[name]
+    }
   }
+  else if (typeof nameOrResourceId === 'number') {
+    resourceId = String(nameOrResourceId)
+    name = resourceId
+  }
+
+  return new EffectData(
+    generateId(),
+    resourceId,
+    name,
+  )
 }
 
 /**
- * 获取时间戳
- * @param formatter 格式化类型，16位时间戳
- * @returns 时间戳
+ * 生成转场数据
+ * @param nameOrResourceId 动画名称或资源id
+ * @param duration 持续时间
  */
-export function getTimestamp(formatter: number = 16): number {
-  if (formatter === 16) {
-    // 16位时间戳：微秒级
-    return Date.now() * 1000;
+export function generateTransitionData(nameOrResourceId: string | number, duration: number = 0): TransitionData {
+  let resourceId = '6724239388189921806' // 缺省的转场资源ID表示闪黑
+  let name = '闪黑'
+
+  if (typeof nameOrResourceId === 'string') {
+    name = nameOrResourceId
+
+    if (name in transitionDict) {
+      resourceId = transitionDict[name]
+    }
   }
-  return Date.now();
+  else if (typeof nameOrResourceId === 'number') {
+    resourceId = String(nameOrResourceId)
+    name = resourceId
+  }
+
+  return new TransitionData(
+    generateId(),
+    resourceId,
+    duration,
+    name,
+  )
 }
 
 /**
- * 检查文件是否存在
- * @param filePath 文件路径
- * @returns 是否存在
+ * 生成动画数据
+ * @param nameOrResourceId 动画名称或资源id
+ * @param animationType 动画类型 in/out/group
+ * @param start 开始时间
+ * @param duration 持续时间
  */
-export function fileExists(filePath: string): boolean {
-  return fs.existsSync(filePath);
+export function generateAnimationData(
+  nameOrResourceId: string | number,
+  animationType: AnimationTypes = 'in',
+  start: number = 0,
+  duration: number = 0,
+): AnimationData {
+  let resourceId = '' // 缺省的动画资源ID
+  let name = ''
+
+  if (typeof nameOrResourceId === 'string') {
+    name = nameOrResourceId
+
+    if (animationType === 'in' && name in animationInDict) {
+      resourceId = animationInDict[name]
+    }
+
+    if (animationType === 'out' && name in animationOutDict) {
+      resourceId = animationOutDict[name]
+    }
+
+    if (animationType === 'group' && name in animationGroupDict) {
+      resourceId = animationGroupDict[name]
+    }
+  }
+  else if (typeof nameOrResourceId === 'number') {
+    resourceId = String(nameOrResourceId)
+    name = resourceId
+  }
+  return new AnimationData(
+    generateId(),
+    resourceId,
+    duration,
+    animationType,
+    start,
+    name,
+  )
 }
