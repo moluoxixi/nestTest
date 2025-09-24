@@ -3,7 +3,7 @@
  * 对应Python版本的BasicLibrary.io.dirHelper
  */
 
-import * as fs from 'fs';
+import * as fs from 'node:fs'
 
 export class DirHelper {
   /**
@@ -12,7 +12,7 @@ export class DirHelper {
    */
   static ensureExist(dirPath: string): void {
     if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
+      fs.mkdirSync(dirPath, { recursive: true })
     }
   }
 }
@@ -22,5 +22,5 @@ export class DirHelper {
  * @param folderPath 文件夹路径
  */
 export function ensureFolderExists(folderPath: string): void {
-  DirHelper.ensureExist(folderPath);
+  DirHelper.ensureExist(folderPath)
 }
