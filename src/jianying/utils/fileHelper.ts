@@ -3,16 +3,16 @@
  * 对应Python版本的BasicLibrary.io.dirHelper
  */
 
-import * as fs from 'node:fs'
-import path from 'node:path'
+import { existsSync, mkdirSync } from 'node:fs'
+import { basename, extname } from 'node:path'
 
 /**
  * 确保文件夹存在（简化版函数）
  * @param folderPath 文件夹路径
  */
 export function ensureFolderExists(folderPath: string): void {
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true })
+  if (!existsSync(folderPath)) {
+    mkdirSync(folderPath, { recursive: true })
   }
 }
 
@@ -25,7 +25,7 @@ export function ensureFolderExists(folderPath: string): void {
 export function getBaseNameNoExtension(filePath: string): string {
   if (!filePath)
     return ''
-  const baseName = path.basename(filePath)
-  const extName = path.extname(baseName)
+  const baseName = basename(filePath)
+  const extName = extname(baseName)
   return baseName.replace(extName, '')
 }

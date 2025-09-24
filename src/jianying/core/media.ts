@@ -4,7 +4,7 @@
  */
 
 import { generateId } from '../utils/tools'
-import * as template from './template'
+import { getMaterialForMetaInfo, getSegment } from './template'
 import { getBaseNameNoExtension } from '../utils/fileHelper'
 
 /**
@@ -128,7 +128,7 @@ export abstract class Media {
     // B.1. 定义业务属性（最后暴露给草稿文件使用）
 
     // B.1.10. 定义暴露给draft_meta_info文件的属性
-    this.dataForMetaInfo = template.getMaterialForMetaInfo(this.id)
+    this.dataForMetaInfo = getMaterialForMetaInfo(this.id)
 
     // B.1.20. 定义暴露给draft_content文件的属性
     // 内部有各种属性分为两组，并分别为两个组设置别名：material_for_content,track_for_content
@@ -195,7 +195,7 @@ export abstract class Media {
    * 设置草稿文件track中的segment部分
    */
   protected setSegmentDataForContent(): void {
-    const segment = template.getSegment()
+    const segment = getSegment()
 
     // 将本片段应该表示的素材类型，临时记录在"X.xx"内
     // segment['X.material_type'] = this.material_type

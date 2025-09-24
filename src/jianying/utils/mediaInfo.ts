@@ -3,7 +3,7 @@
  * 模拟Python版本的pymediainfo.MediaInfo
  */
 
-import * as path from 'node:path'
+import { extname } from 'node:path'
 
 /**
  * 媒体信息接口
@@ -43,35 +43,37 @@ export class MediaInfoResult {
  * @returns 媒体信息解析结果
  */
 export function parse(mediaFullName: string): MediaInfoResult {
-    const ext = path.extname(mediaFullName).toLowerCase()
-    
-    let trackData: MediaInfoData
-    
-    // 基于文件扩展名模拟媒体信息
-    if (['.mp3', '.wav', '.aac', '.m4a', '.flac'].includes(ext)) {
-      trackData = {
-        track_type: 'Audio',
-        duration: 30,
-      }
-    } else if (['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'].includes(ext)) {
-      trackData = {
-        track_type: 'Image',
-        width: 1920,
-        height: 1080,
-        duration: 5,
-      }
-    } else {
-      // 默认为视频
-      trackData = {
-        track_type: 'Video',
-        width: 1920,
-        height: 1080,
-        duration: 10,
-      }
-    }
+  const ext = extname(mediaFullName).toLowerCase()
 
-    return new MediaInfoResult([
-      { track_type: 'General' }, // tracks[0] - 通常是General track
-      trackData, // tracks[1] - 实际的媒体数据
-    ])
+  let trackData: MediaInfoData
+
+  // 基于文件扩展名模拟媒体信息
+  if (['.mp3', '.wav', '.aac', '.m4a', '.flac'].includes(ext)) {
+    trackData = {
+      track_type: 'Audio',
+      duration: 30,
+    }
   }
+  else if (['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'].includes(ext)) {
+    trackData = {
+      track_type: 'Image',
+      width: 1920,
+      height: 1080,
+      duration: 5,
+    }
+  }
+  else {
+    // 默认为视频
+    trackData = {
+      track_type: 'Video',
+      width: 1920,
+      height: 1080,
+      duration: 10,
+    }
+  }
+
+  return new MediaInfoResult([
+    { track_type: 'General' }, // tracks[0] - 通常是General track
+    trackData, // tracks[1] - 实际的媒体数据
+  ])
+}

@@ -10,7 +10,7 @@
  * 完全按照Python版本 mediaFactory.py 一比一还原
  */
 
-import * as fs from 'node:fs'
+import { existsSync } from 'node:fs'
 import { upperFirstChar } from '../utils/stringHelper'
 import { parse as parseMediaInfo } from '../utils/mediaInfo'
 import { Media } from './media'
@@ -32,7 +32,7 @@ export class MediaFactory {
    * @returns 媒体实例或null
    */
   static create(mediaFullName: string, kwargs: any = {}): Media | null {
-    if (!fs.existsSync(mediaFullName)) {
+    if (!existsSync(mediaFullName)) {
       return null
     }
 

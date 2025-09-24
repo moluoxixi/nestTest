@@ -3,7 +3,7 @@
  * 完全按照Python版本 tools.py 实现，一比一复刻
  */
 
-import * as fs from 'node:fs'
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { v4 as uuidv4 } from 'uuid'
 import { ensureFolderExists } from './fileHelper'
 import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
@@ -21,7 +21,7 @@ export function generateId(): string {
  * @param path 文件路径
  */
 export function readJson(path: string): any {
-  const content = fs.readFileSync(path, 'utf-8')
+  const content = readFileSync(path, 'utf-8')
   return JSON.parse(content)
 }
 
@@ -33,7 +33,7 @@ export function readJson(path: string): any {
 export function writeJson(path: string, data: any): void {
   // 给json.dump添加参数 ensure_ascii=false可以保证汉字不被编码
   const content = JSON.stringify(data, null, 2)
-  fs.writeFileSync(path, content, 'utf-8')
+  writeFileSync(path, content, 'utf-8')
 }
 
 /**
@@ -41,8 +41,8 @@ export function writeJson(path: string, data: any): void {
  * @param folderPath 文件夹路径
  */
 export function createFolder(folderPath: string): void {
-  if (fs.existsSync(folderPath)) {
-    fs.rmSync(folderPath, { recursive: true, force: true })
+  if (existsSync(folderPath)) {
+    rmSync(folderPath, { recursive: true, force: true })
   }
 
   ensureFolderExists(folderPath)
