@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
-import { GoogleModelService } from '../googleModel.service'
-import type { lyriaMusicGenerationConfigType } from '../types/lyria'
+import { GoogleModelService } from '@/googleModel/googleModel.service'
+import type { lyriaMusicGenerationConfigType } from '@/googleModel/types/lyria'
 
 @Controller('googleModel/lyria')
 export class LyriaController {

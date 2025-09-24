@@ -3,6 +3,7 @@ import { exec, pipeExec } from './utils/exec'
 import type { runProdParamsType } from './_types'
 import { loadEnvFromFile } from './utils/env'
 import { mkdir } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 /**
@@ -49,12 +50,19 @@ function runProd(options: runProdParamsType = {}) {
     pipeExec(`docker rm -f ${actualContainerName}`)
   }
   // 运行容器（依赖外部 DB，通过 .env 提供 DATABASE_URL）
-  // - 映射端口到 3000（应用默认端口）
+  // - 容器内监听端口优先使用 .env 中的 PORT；否则回退为 3000
+  // - 将宿主机 4000 映射到容器内实际端口，确保外部访问为 4000
   // - 将宿主机 ./public 挂载到容器 /app/public，便于持久化与对外静态访问
   const volumeFlag = `-v "${hostPublicDir}:/app/public"`
-  console.log('hostPublicDir',hostPublicDir);
+  // 读取 .env 的 PORT（若存在）；否则尝试使用进程环境变量 PORT
+  const hasEnvFile = existsSync(resolve(process.cwd(), '.env'))
+  const appEnv = hasEnvFile ? loadEnvFromFile({ filePath: '.env' }) : {}
+  const containerPort = Number(appEnv.PORT || process.env.PORT) || 3000
+  console.log('hostPublicDir', hostPublicDir)
+  console.log('containerPort', containerPort)
+  const envFileFlag = hasEnvFile ? '--env-file .env' : ''
   exec(
-    `docker run -d -t --name ${actualContainerName} -p 4000:4000 ${volumeFlag} --env-file .env ${tag}`,
+    `docker run -d -t --name ${actualContainerName} -p 4000:${containerPort} ${volumeFlag} ${envFileFlag} ${tag}`,
   )
 
   // 如需推送到远端仓库（仅推送 latest 标签）

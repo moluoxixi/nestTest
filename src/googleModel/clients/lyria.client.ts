@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { createWriteStream } from 'node:fs'
-import { lyriaGenerateMusicParamsType, lyriaGenerateMusicResultType } from '../types/lyria'
+import { lyriaGenerateMusicParamsType, lyriaGenerateMusicResultType } from '@/googleModel/types/lyria'
 
 export class Lyria {
   protected ai: any

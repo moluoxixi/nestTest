@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai'
 import { Buffer } from 'node:buffer'
 import { mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '../types/veo'
+import { veoGenerateVideosParamsType, veoGenerateVideosResultType } from '@/googleModel/types/veo'
 
 export class Veo {
   protected ai: any

@@ -1,9 +1,9 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
-import { GoogleModelService } from '../googleModel.service'
-import { VideosService } from '../../videos/videos.service'
+import { GoogleModelService } from '@/googleModel/googleModel.service'
+import { VideosService } from '@/videos/videos.service'
 import { writeFile } from 'node:fs/promises'
-import { veoTestWriteParamsType, veoTestWriteResultType } from '../types/veo'
+import { veoTestWriteParamsType, veoTestWriteResultType } from '@/googleModel/types/veo'
 
 @Controller('googleModel/veo')
 export class VeoController {

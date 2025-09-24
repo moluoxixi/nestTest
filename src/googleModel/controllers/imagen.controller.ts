@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { Request } from 'express'
-import { GoogleModelService } from '../googleModel.service'
+import { GoogleModelService } from '@/googleModel/googleModel.service'
 
 @Controller('googleModel/imagen')
 export class ImagenController {
