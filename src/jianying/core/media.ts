@@ -1,230 +1,187 @@
 /**
  * 媒体基类
- * 所有媒体类型的基础抽象类
+ * 完全按照Python版本 media.py 实现
  */
 
-import {
-  MediaInfo, 
-  AddMediaOptions, 
-  MediaType, 
-  MaterialType, 
-  TrackType,
-} from '../_types';
-import { generateId, getBaseNameNoExtension } from '../utils/tools';
-import { getMaterialForMetaInfo, getSegment } from '../templates/template';
+import * as path from 'path';
+import { generateId } from '../utils/tools';
+import * as template from './template';
+
+// 媒体信息接口
+export interface MediaInfo {
+  track_type: string;
+  width?: number;
+  height?: number;
+  duration?: number;
+  [key: string]: any;
+}
 
 /**
- * 媒体抽象基类
+ * 媒体基类
  */
 export abstract class Media {
-  /** 媒体类型映射到素材类型 */
-  protected static readonly MEDIA_MATERIAL_TYPE_MAPPING: Record<MediaType, MaterialType> = {
-    audio: 'music',
-    image: 'photo',
-    video: 'video',
-    text: 'text',
+  // 类型映射（完全按照Python版本）
+  static readonly mediaMaterialTypeMapping: Record<string, string> = {
+    "audio": "music",
+    "image": "photo",
   };
 
-  /** 媒体类型映射到轨道类型 */
-  protected static readonly MEDIA_CATEGORY_TYPE_MAPPING: Record<MediaType, TrackType> = {
-    image: 'video',
-    video: 'video',
-    audio: 'audio',
-    text: 'text',
+  static readonly mediaCategoryTypeMapping: Record<string, string> = {
+    "image": "video"
   };
 
   // 基础属性
-  /** 全局唯一标识符 */
-  public readonly id: string;
-  /** 媒体文件真实类型 */
-  public mediaType: MediaType;
-  /** 素材类型（在草稿中的类型） */
-  public materialType: MaterialType;
-  /** 轨道类型 */
-  public categoryType: TrackType;
-  /** 宽度 */
-  public width: number;
-  /** 高度 */
-  public height: number;
-  /** 时长（微秒） */
-  public duration: number;
-  /** 素材名称 */
-  public materialName: string;
-  /** 文件路径 */
-  public filePath: string;
-  /** 额外信息 */
-  public extraInfo: string;
+  public id: string;
+  public mediaType: string = '';
+  public materialType: string = '';
+  public categoryType: string = '';
+  public width: number = 0;
+  public height: number = 0;
+  public duration: number = 0;
+  public materialName: string = '';
+  public filePath: string = '';
+  public extraInfo: string = '';
 
   // 业务属性
-  /** 元数据信息 */
   public dataForMetaInfo: any;
-  /** 内容数据 */
-  public dataForContent: {
-    material: Record<string, any>;
-    segment: any;
-  };
-  /** 素材数据（用于内容） */
-  public materialDataForContent: Record<string, any>;
-  /** 片段数据（用于内容） */
+  public dataForContent: any;
+  public materialDataForContent: any;
   public segmentDataForContent: any;
 
-  /** 传入的选项参数 */
-  protected readonly options: AddMediaOptions;
+  // 保存传递进来的参数
+  protected kwargs: any;
 
-  /**
-   * 构造函数
-   * @param mediaFileFullName 媒体文件完整路径
-   * @param options 选项参数
-   */
-  protected constructor(mediaFileFullName: string, options: AddMediaOptions = {}) {
-    this.options = options;
+  constructor(kwargs: any = {}) {
+    this.kwargs = kwargs;
 
-    // 初始化基础属性
-    this.id = generateId();
-    this.mediaType = 'video'; // 默认值，子类会覆盖
-    this.materialType = 'video';
-    this.categoryType = 'video';
-    this.width = 0;
-    this.height = 0;
-    this.duration = 0;
-    this.materialName = '';
-    this.filePath = '';
-    this.extraInfo = '';
+    // A.1. 定义基础属性
+    this.id = generateId(); // 在meta_info和content中都使用同一个guid
 
-    // 初始化基础信息前的钩子
+    // A.2 初始化基础属性
+    // A.2.00. 为初始化基础属性前加载逻辑
     this.initBasicInfoBefore();
 
-    // 加载文件基础信息
-    this.loadFileBasicInfo(mediaFileFullName);
-
-    // 加载媒体信息
-    if (options.mediaInfo) {
-      this.loadPropertyFromMediaInfo(options.mediaInfo);
-    }
-
-    // 设置类型信息
-    this.setTypeInfo();
-
-    // 处理自定义时长
-    if (options.duration) {
-      this.duration = options.duration;
-    }
-
-    // 初始化基础信息后的钩子
-    this.initBasicInfoAfter();
-
-    // 初始化业务属性
-    this.dataForContent = {
-      material: {},
-      segment: {},
-    };
-    this.materialDataForContent = this.dataForContent.material;
-    this.segmentDataForContent = this.dataForContent.segment;
-
-    // 初始化业务信息前的钩子
-    this.initBizInfoBefore();
-
-    // 设置元数据信息
-    this.dataForMetaInfo = getMaterialForMetaInfo(this.id);
-    this.setDataForMetaInfo();
-
-    // 设置内容数据
-    this.setDataForContent();
-
-    // 初始化业务信息后的钩子
-    this.initBizInfoAfter();
-  }
-
-  /**
-   * 初始化基础属性前的钩子（供子类重写）
-   */
-  protected initBasicInfoBefore(): void {
-    // 子类可重写此方法
-  }
-
-  /**
-   * 初始化基础属性后的钩子（供子类重写）
-   */
-  protected initBasicInfoAfter(): void {
-    // 子类可重写此方法
-  }
-
-  /**
-   * 初始化业务属性前的钩子（供子类重写）
-   */
-  protected initBizInfoBefore(): void {
-    // 子类可重写此方法
-  }
-
-  /**
-   * 初始化业务属性后的钩子（供子类重写）
-   */
-  protected initBizInfoAfter(): void {
-    // 子类可重写此方法
-  }
-
-  /**
-   * 加载文件基础信息
-   * @param mediaFileFullName 媒体文件完整路径
-   */
-  private loadFileBasicInfo(mediaFileFullName: string): void {
-    const mediaBaseNameNoExtension = getBaseNameNoExtension(mediaFileFullName);
+    // A.2.10. 加载各种资源的文件名称等基础信息
+    const mediaFileFullName = kwargs.mediaFileFullName || "";
+    const mediaBaseNameNoExtension = this.getBaseNameNoExtension(mediaFileFullName);
     this.extraInfo = mediaBaseNameNoExtension;
     this.materialName = mediaBaseNameNoExtension;
     this.filePath = mediaFileFullName;
+
+    // A.2.20. 加载各种媒体公共的信息
+    const mediaInfo = kwargs.mediaInfo;
+    this.loadPropertyFromMediaInfo(mediaInfo);
+    this.setTypeInfo();
+
+    // A.2.30. 加载媒体的自定义设置
+    const duration = kwargs.duration;
+    if (duration) {
+      this.duration = duration;
+    }
+
+    // A.2.99. 为初始化基础属性后加载逻辑
+    this.initBasicInfoAfter();
+
+    // B.1. 定义业务属性（最后暴露给草稿文件使用）
+    // B.1.10. 定义暴露给draft_meta_info文件的属性
+    this.dataForMetaInfo = this.getMaterialForMetaInfo(this.id);
+
+    // B.1.20. 定义暴露给draft_content文件的属性
+    this.dataForContent = {
+      "material": {},
+      "segment": {},
+    };
+
+    // B.2 初始化业务属性
+    // B.2.00. 为初始化业务属性前加载逻辑
+    this.initBizInfoBefore();
+
+    // B.2.10. 对外暴露内容
+    this.setDataForContent();
+
+    // B.2.99. 为初始化业务属性后加载逻辑
+    this.initBizInfoAfter();
+
+    // 设置别名，方便调用
+    this.materialDataForContent = this.dataForContent["material"];
+    this.segmentDataForContent = this.dataForContent["segment"];
+
+    // 最后，为draft_meta_info中的metetype准备信息
+    this.setDataForMetaInfo();
   }
 
   /**
-   * 从媒体信息中加载属性
-   * @param mediaInfo 媒体信息
+   * 在初始化基础属性前加载逻辑（供派生类使用）
    */
-  private loadPropertyFromMediaInfo(mediaInfo: MediaInfo): void {
-    if (!mediaInfo) {
-      return;
-    }
-
-    this.mediaType = mediaInfo.track_type.toLowerCase() as MediaType;
-
-    if (mediaInfo.width !== undefined && mediaInfo.height !== undefined) {
-      this.width = mediaInfo.width;
-      this.height = mediaInfo.height;
-    }
-
-    if (mediaInfo.duration !== undefined) {
-      let duration = mediaInfo.duration * 1000000; // 转换为微秒（秒 * 1,000,000）
-      
-      // 如果设置了截取时间start_in_media，那么duration需要减去start_in_media的时间
-      const startInMedia = this.options.start_in_media || 0;
-      this.duration = duration - startInMedia;
-    }
+  protected initBasicInfoBefore(): void {
+    // 可以被派生类重写
   }
 
   /**
-   * 设置类型信息
+   * 在初始化基础属性后加载逻辑（供派生类使用）
    */
-  private setTypeInfo(): void {
-    // 如果选项中强制指定了媒体类型，使用指定的类型
-    if (this.options.media_type) {
-      this.mediaType = this.options.media_type;
-    }
-
-    // 设置素材类型
-    if (Media.MEDIA_MATERIAL_TYPE_MAPPING[this.mediaType]) {
-      this.materialType = Media.MEDIA_MATERIAL_TYPE_MAPPING[this.mediaType];
-    } else {
-      this.materialType = this.mediaType as MaterialType;
-    }
-
-    // 设置轨道类型
-    if (Media.MEDIA_CATEGORY_TYPE_MAPPING[this.mediaType]) {
-      this.categoryType = Media.MEDIA_CATEGORY_TYPE_MAPPING[this.mediaType];
-    } else {
-      this.categoryType = this.mediaType as TrackType;
-    }
+  protected initBasicInfoAfter(): void {
+    // 可以被派生类重写
   }
 
   /**
-   * 设置元数据信息
+   * 在初始化业务属性前加载逻辑（供派生类使用）
+   */
+  protected initBizInfoBefore(): void {
+    // 可以被派生类重写
+  }
+
+  /**
+   * 在初始化业务属性后加载逻辑（供派生类使用）
+   */
+  protected initBizInfoAfter(): void {
+    // 可以被派生类重写
+  }
+
+  /**
+   * 为草稿文件draft_content准备信息
+   */
+  private setDataForContent(): void {
+    this.setMaterialDataForContent();
+    this.setSegmentDataForContent();
+  }
+
+  /**
+   * 设置草稿文件的material部分（抽象方法，需要派生类实现）
+   */
+  protected abstract setMaterialDataForContent(): void;
+
+  /**
+   * 设置草稿文件track中的segment部分
+   */
+  protected setSegmentDataForContent(): void {
+    const segment = template.getSegment();
+
+    const speed = this.kwargs.speed || 1.0;
+    segment.speed = speed; // 速度
+    const startInMedia = this.kwargs.start_in_media || 0;
+
+    segment.material_id = this.id;
+    segment.extra_material_refs = this.materialDataForContent["X.extra_material_refs"];
+
+    // 时长，如果开始时间大于0，那么播放时长 = 总时长 - 开始时间
+    if (startInMedia > 0) {
+      segment.source_timerange.start = startInMedia;
+      segment.source_timerange.duration = this.duration - startInMedia;
+    } else {
+      segment.source_timerange.start = 0;
+      segment.source_timerange.duration = this.duration;
+    }
+
+    // 轨道上的时长
+    segment.target_timerange.duration = segment.source_timerange.duration;
+    segment.target_timerange.start = 0; // 由外部设置
+
+    this.dataForContent["segment"] = segment;
+  }
+
+  /**
+   * 为草稿文件draft_meta_info准备信息
    */
   private setDataForMetaInfo(): void {
     this.dataForMetaInfo.metetype = this.materialType;
@@ -236,42 +193,82 @@ export abstract class Media {
   }
 
   /**
-   * 设置内容数据
+   * 从媒体信息中加载素材信息
    */
-  private setDataForContent(): void {
-    this.setMaterialDataForContent();
-    this.setSegmentDataForContent();
+  private loadPropertyFromMediaInfo(mediaInfo: MediaInfo): void {
+    if (!mediaInfo) {
+      return;
+    }
+
+    this.mediaType = mediaInfo.track_type.toLowerCase();
+
+    if (mediaInfo.width !== undefined && mediaInfo.height !== undefined) {
+      this.width = mediaInfo.width;
+      this.height = mediaInfo.height;
+    }
+
+    if (mediaInfo.duration !== undefined) {
+      // Python版本乘以1000，但根据实际需要应该是1000000（微秒）
+      let duration = mediaInfo.duration * 1000000;
+      // 如果设置了截取时间start_in_media，那么duration需要减去start_in_media的时间
+      const startInMedia = this.kwargs.start_in_media || 0;
+      this.duration = duration - startInMedia;
+    }
   }
 
   /**
-   * 设置素材数据（抽象方法，子类必须实现）
+   * 设置类型信息
    */
-  protected abstract setMaterialDataForContent(): void;
+  private setTypeInfo(): void {
+    const type = this.kwargs.media_type;
+    if (type) {
+      this.mediaType = type;
+    }
+
+    if (this.mediaType in Media.mediaMaterialTypeMapping) {
+      this.materialType = Media.mediaMaterialTypeMapping[this.mediaType];
+    } else {
+      this.materialType = this.mediaType;
+    }
+
+    if (this.mediaType in Media.mediaCategoryTypeMapping) {
+      this.categoryType = Media.mediaCategoryTypeMapping[this.mediaType];
+    } else {
+      this.categoryType = this.mediaType;
+    }
+  }
 
   /**
-   * 设置片段数据
+   * 获取文件名（不包含扩展名）
    */
-  protected setSegmentDataForContent(): void {
-    const segment = getSegment();
+  private getBaseNameNoExtension(filePath: string): string {
+    if (!filePath) return '';
+    const baseName = path.basename(filePath);
+    const extName = path.extname(baseName);
+    return baseName.replace(extName, '');
+  }
 
-    const speed = this.options.speed || 1.0;
-    segment.speed = speed;
-    
-    const startInMedia = this.options.start_in_media || 0;
-
-    segment.material_id = this.id;
-    segment.extra_material_refs = this.materialDataForContent['X.extra_material_refs'] || [];
-
-    segment.source_timerange = {
-      duration: this.duration,
-      start: startInMedia,
+  /**
+   * 获取元数据模板
+   */
+  private getMaterialForMetaInfo(guid: string): any {
+    // 简化版的模板，对应Python的template.get_material_for_meta_info
+    return {
+      "create_time": Date.now(),
+      "duration": 0,
+      "extra_info": "",
+      "file_Path": "",
+      "height": 0,
+      "id": guid,
+      "import_time": Date.now(),
+      "import_time_ms": Date.now(),
+      "item_source": 1,
+      "md5": "",
+      "metetype": "",
+      "roughcut_time_range": {"duration": 0, "start": 0},
+      "sub_time_range": {"duration": -1, "start": -1},
+      "type": 0,
+      "width": 0
     };
-
-    segment.target_timerange = {
-      duration: this.duration / speed,
-      start: 0,
-    };
-
-    this.segmentDataForContent = segment;
   }
 }

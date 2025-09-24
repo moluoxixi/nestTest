@@ -1,282 +1,170 @@
 /**
  * 剪映草稿核心类
- * 负责管理和生成剪映草稿文件
+ * 完全按照Python版本 draft.py 一比一复刻
  */
 
 import * as path from 'path';
+import * as os from 'os';
 import { Media } from './media';
-import { MediaEffect } from './mediaEffect';
 import { MediaFactory } from './mediaFactory';
-import {
-  AddEffectOptions,
-  AddMediaOptions,
-  DraftContentData,
-  DraftCreateOptions,
-  DraftMetaInfoData,
-  JianyingConfig,
-  TrackType
-} from '../_types';
-import { ensureFolderExists, generateId, getTimestamp, readJson, writeJson } from '../utils/tools';
-import { getTrack } from '../templates/template';
+import { ConfigHelper } from '../utils/config';
+import { DateTimeHelper } from '../utils/dateTimeHelper';
+import { createFolder, readJson, writeJson } from '../utils/tools';
+import { getTrack } from './template';
 
 /**
  * 剪映草稿类
  */
 export class Draft {
-  /** 草稿内容文件名 */
-  private static readonly DRAFT_CONTENT_FILE_NAME = 'draft_content.json';
-  /** 草稿元数据文件名 */
-  private static readonly DRAFT_META_INFO_FILE_NAME = 'draft_meta_info.json';
+  // 文件名常量（完全按照Python版本）
+  private static readonly _draftContentFileBaseName = "draft_content.json";
+  private static readonly _draftMetaInfoFileBaseName = "draft_meta_info.json";
 
-  /** 草稿名称 */
-  private readonly draftName: string;
-  /** 草稿根目录 */
-  private readonly draftsRoot: string;
-  /** 草稿文件夹路径 */
-  private readonly draftFolder: string;
-  /** 草稿内容数据 */
-  private draftContentData: DraftContentData;
-  /** 草稿元数据 */
-  private draftMetaInfoData: DraftMetaInfoData;
+  // 私有属性（完全按照Python版本）
+  private _draftsRoot: string;
+  private _draftFolder: string;
+  private _draftContentData: any;
+  private _draftMetaInfoData: any;
 
-  // 快捷访问变量
-  /** 草稿内容库的素材 */
-  private materialsInDraftContent: any;
-  /** 草稿元数据库的素材 */
-  private materialsInDraftMetaInfo: any;
-  /** 草稿元数据库的视频素材 */
-  private videosMaterialInDraftMetaInfo: any[];
-  /** 草稿元数据库的音频素材 */
-  private audiosMaterialInDraftMetaInfo: any[];
-  /** 草稿内容库的轨道 */
-  private tracksInDraftContent: any[];
+  // 快捷访问变量（完全按照Python版本）
+  private _materialsInDraftContent: any;
+  private _materialsInDraftMetaInfo: any;
+  private _videosMaterialInDraftMetaInfo: any[];
+  private _audiosMaterialInDraftMetaInfo: any[];
+  private _tracksInDraftContent: any[];
 
   /**
    * 构造函数
-   * @param options 创建选项
+   * @param name 草稿名称，如果为空则使用时间戳
    */
-  constructor(options: DraftCreateOptions = {}) {
-    // 设置草稿名称
-    this.draftName = options.name || this.generateDraftName();
-
-    // 设置配置
-    const config = this.getDefaultConfig();
-    if (options.config) {
-      Object.assign(config, options.config);
+  constructor(name: string = "") {
+    if (!name) {
+      name = this.getTimeString();
     }
-    this.draftsRoot = config.drafts_root;
 
-    // 设置草稿文件夹路径
-    this.draftFolder = path.join(this.draftsRoot, this.draftName);
+    // 草稿保存位置
+    this._draftsRoot = ConfigHelper.getItem("JianYingDraft.basic", "drafts_root", "C:\\Jianying.Drafts");
+    this._draftFolder = path.join(this._draftsRoot, name);
 
-    // 初始化草稿数据
-    this.initializeDraftData();
+    // 从模板获取草稿的基础数据
+    const here = __dirname;
+    const templateFolder = path.join(path.dirname(here), "templates");
+    this._draftContentData = readJson(path.join(templateFolder, Draft._draftContentFileBaseName));
+    this._draftMetaInfoData = readJson(path.join(templateFolder, Draft._draftMetaInfoFileBaseName));
+
+    // 初始化草稿内容信息
+    this._draftContentData.id = this.generateId();
+
+    // 初始化草稿元数据信息
+    this._draftMetaInfoData.id = this.generateId();
+    this._draftMetaInfoData.draft_fold_path = this._draftFolder.replace(/\\/g, '/');
+    this._draftMetaInfoData.draft_timeline_metetyperials_size_ = 0;
+    this._draftMetaInfoData.tm_draft_create = DateTimeHelper.getTimestamp(16);
+    this._draftMetaInfoData.tm_draft_modified = DateTimeHelper.getTimestamp(16);
+    this._draftMetaInfoData.draft_root_path = this._draftsRoot.replace(/\//g, '\\');
+    this._draftMetaInfoData.draft_removable_storage_device = this._draftsRoot.split(':/')[0];
+
+    // 为方便调用目标文件中的material部分，定义快捷变量（完全按照Python版本）
+    this._materialsInDraftContent = this._draftContentData.materials; // 草稿内容库的素材
+    this._materialsInDraftMetaInfo = this._draftMetaInfoData.draft_materials; // 草稿元数据库的素材
+    
+    // 完全按照Python版本的索引访问
+    this._videosMaterialInDraftMetaInfo = this._materialsInDraftMetaInfo[0].value;
+    this._audiosMaterialInDraftMetaInfo = this._materialsInDraftMetaInfo[6].value; // type为8的那条
+    
+    this._tracksInDraftContent = this._draftContentData.tracks; // 草稿内容库的轨道
   }
 
   /**
    * 添加媒体到草稿
-   * @param mediaFileFullName 媒体文件完整路径
-   * @param startAtTrack 在轨道上的开始时间（微秒）
-   * @param duration 持续时间（微秒）
-   * @param index 索引（暂未使用）
-   * @param options 其他选项
+   * 完全按照Python版本实现
    */
-  public addMedia(
-    mediaFileFullName: string, 
-    startAtTrack = 0, 
-    duration = 0, 
-    index = 0, 
-    options: AddMediaOptions = {}
-  ): void {
-    // 为了保持向后兼容，如果第二个参数是对象，则使用新的接口
-    if (typeof startAtTrack === 'object') {
-      options = startAtTrack as AddMediaOptions;
-      startAtTrack = 0;
-      duration = 0;
-    }
+  public addMedia(mediaFileFullName: string, startAtTrack: number = 0, duration: number = 0, index: number = 0, kwargs: any = {}): void {
+    const _index = index; // Python版本有这个变量但没使用
 
-    // 如果指定了duration，将其添加到options中
-    if (duration > 0) {
-      if (typeof options !== 'object' || options === null) {
-        options = {};
-      }
-      options.duration = duration;
-    }
+    const media = MediaFactory.create(mediaFileFullName, { duration, ...kwargs });
 
-    const media = MediaFactory.create(mediaFileFullName, options);
-    
-    if (!media) {
-      console.warn(`无法创建媒体实例: ${mediaFileFullName}`);
+    if (media === null) {
       return;
     }
 
-    this.addMediaToContent(media, startAtTrack);
-  }
+    // 将媒体信息添加到draft的素材库
+    this.__addMediaToContentMaterials(media);
 
-  /**
-   * 添加文本到草稿
-   * @param textContent 文本内容
-   * @param options 添加选项
-   */
-  public addText(textContent: string, options: AddMediaOptions = {}): void {
-    const textMedia = MediaFactory.createText(textContent, options);
-    this.addMediaToContent(textMedia);
-  }
+    // 将媒体信息添加到draft的轨道库
+    this.__addMediaToContentTracks(media, startAtTrack);
 
-  /**
-   * 添加特效到草稿
-   * @param effectNameOrResourceId 特效名称或资源ID
-   * @param options 特效选项
-   */
-  public addEffect(effectNameOrResourceId: string | number, options: AddEffectOptions = {}): void {
-    const effectMedia = new MediaEffect(effectNameOrResourceId, options);
-    
-    // 将特效信息添加到draft的素材库
-    this.addMediaToContentMaterials(effectMedia);
-    
-    // 将特效信息添加到draft的轨道库
-    this.addMediaToContentTracks(effectMedia, options.start || 0);
-    
-    // 特效不需要添加到元数据库
+    // 将媒体信息添加到draft的元数据库
+    this.__addMediaToMetaInfo(media);
   }
 
   /**
    * 计算草稿时长
-   * @returns 草稿时长（微秒）
+   * 完全按照Python版本实现
    */
   public calcDraftDuration(): number {
-    return this.getTrackDuration('video');
+    return this.__getTrackDuration("video");
   }
 
   /**
    * 保存草稿
+   * 完全按照Python版本实现
    */
   public save(): void {
     // 校准时长信息
-    this.calcDuration();
+    this.__calcDuration();
 
-    // 创建项目文件夹
-    ensureFolderExists(this.draftFolder);
+    // 新建项目文件夹
+    createFolder(this._draftFolder);
 
     // 持久化草稿
-    const draftContentFilePath = path.join(this.draftFolder, Draft.DRAFT_CONTENT_FILE_NAME);
-    const draftMetaInfoFilePath = path.join(this.draftFolder, Draft.DRAFT_META_INFO_FILE_NAME);
-    
-    writeJson(draftContentFilePath, this.draftContentData);
-    writeJson(draftMetaInfoFilePath, this.draftMetaInfoData);
-
-    console.log(`草稿已保存到: ${this.draftFolder}`);
-  }
-
-  /**
-   * 生成草稿名称
-   * @returns 基于时间戳的草稿名称
-   */
-  private generateDraftName(): string {
-    const now = new Date();
-    return `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}.${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
-  }
-
-  /**
-   * 获取默认配置
-   * @returns 默认配置对象
-   */
-  private getDefaultConfig(): JianyingConfig {
-    const { ConfigHelper } = require('../config/config');
-    return ConfigHelper.getJianyingConfig();
-  }
-
-  /**
-   * 初始化草稿数据
-   */
-  private initializeDraftData(): void {
-    // 从模板文件加载基础数据
-    const templateFolder = path.join(__dirname, '../templates');
-    
-    this.draftContentData = readJson(path.join(templateFolder, Draft.DRAFT_CONTENT_FILE_NAME));
-    this.draftMetaInfoData = readJson(path.join(templateFolder, Draft.DRAFT_META_INFO_FILE_NAME));
-
-    // 初始化草稿内容信息
-    this.draftContentData.id = generateId();
-
-    // 初始化草稿元数据信息
-    this.draftMetaInfoData.draft_id = generateId();
-    this.draftMetaInfoData.draft_fold_path = this.draftFolder.replace(/\\/g, '/');
-    this.draftMetaInfoData.draft_timeline_materials_size_ = 0;
-    this.draftMetaInfoData.tm_draft_create = getTimestamp();
-    this.draftMetaInfoData.tm_draft_modified = getTimestamp();
-    this.draftMetaInfoData.draft_root_path = this.draftsRoot.replace(/\//g, '\\');
-    
-    // 设置可移动存储设备（Windows驱动器盘符）
-    if (process.platform === 'win32') {
-      this.draftMetaInfoData.draft_removable_storage_device = this.draftsRoot.split(':')[0];
-    }
-
-    // 设置快捷访问变量
-    this.materialsInDraftContent = this.draftContentData.materials;
-    this.materialsInDraftMetaInfo = this.draftMetaInfoData.draft_materials;
-    
-    // 按照Python版本的逻辑，查找对应type的材料
-    this.videosMaterialInDraftMetaInfo = this.materialsInDraftMetaInfo.find(m => m.type === 0)?.value || [];
-    this.audiosMaterialInDraftMetaInfo = this.materialsInDraftMetaInfo.find(m => m.type === 8)?.value || [];
-    
-    this.tracksInDraftContent = this.draftContentData.tracks;
-  }
-
-  /**
-   * 添加媒体到内容
-   * @param media 媒体对象
-   * @param startAtTrack 在轨道上的开始时间
-   */
-  private addMediaToContent(media: Media, startAtTrack = 0): void {
-    // 将媒体信息添加到draft的素材库
-    this.addMediaToContentMaterials(media);
-
-    // 将媒体信息添加到draft的轨道库
-    this.addMediaToContentTracks(media, startAtTrack);
-
-    // 将媒体信息添加到draft的元数据库
-    this.addMediaToMetaInfo(media);
+    const draftContentFileFullName = path.join(this._draftFolder, Draft._draftContentFileBaseName);
+    const draftMetaInfoFileFullName = path.join(this._draftFolder, Draft._draftMetaInfoFileBaseName);
+    writeJson(draftContentFileFullName, this._draftContentData);
+    writeJson(draftMetaInfoFileFullName, this._draftMetaInfoData);
   }
 
   /**
    * 添加媒体信息到素材内容库的素材部分
-   * @param media 媒体对象
+   * 完全按照Python版本实现
    */
-  private addMediaToContentMaterials(media: Media): void {
-    for (const [key, value] of Object.entries(media.materialDataForContent)) {
+  private __addMediaToContentMaterials(media: Media): void {
+    for (const [_key, _value] of Object.entries(media.materialDataForContent)) {
+      const key = String(_key);
+
       // 排除中转使用的临时信息
-      if (key.startsWith('X.')) {
+      if (key.startsWith("X.")) {
         continue;
       }
 
-      if (!this.materialsInDraftContent[key]) {
-        this.materialsInDraftContent[key] = [];
-      }
-
-      this.materialsInDraftContent[key].push(value);
+      this._materialsInDraftContent[key].push(_value);
     }
   }
 
   /**
    * 添加媒体信息到素材内容库的轨道部分
-   * @param media 媒体对象
-   * @param start 开始时间
+   * 完全按照Python版本实现
    */
-  private addMediaToContentTracks(media: Media, start: number): void {
-    // 查找目标轨道
-    let targetTrack = this.tracksInDraftContent.find(track => track.type === media.categoryType);
-
-    // 如果轨道不存在，创建新轨道
-    if (!targetTrack) {
-      targetTrack = getTrack();
-      targetTrack.type = media.categoryType;
-      this.tracksInDraftContent.push(targetTrack);
+  private __addMediaToContentTracks(media: Media, start: number = 0): void {
+    const allTracks = this._tracksInDraftContent;
+    let targetTrack = null;
+    
+    for (const _track of allTracks) {
+      if (_track.type === media.categoryType) {
+        targetTrack = _track;
+        break;
+      }
     }
 
-    // 如果没有指定开始时间，使用轨道的当前总时长
+    if (targetTrack === null) {
+      targetTrack = getTrack();
+      targetTrack.type = media.categoryType;
+      this._tracksInDraftContent.push(targetTrack);
+    }
+
     if (!start) {
-      start = this.getTrackDuration(media.categoryType);
+      // 添加新片段之前轨道总时长
+      start = this.__getTrackDuration(media.categoryType);
     }
 
     // 设置新segment的在轨道上的开始时间
@@ -287,64 +175,76 @@ export class Draft {
 
   /**
    * 添加媒体信息到元数据库
-   * @param media 媒体对象
+   * 完全按照Python版本实现
    */
-  private addMediaToMetaInfo(media: Media): void {
-    if (media.categoryType === 'video') {
-      this.videosMaterialInDraftMetaInfo.push(media.dataForMetaInfo);
-    } else if (media.categoryType === 'audio') {
-      this.audiosMaterialInDraftMetaInfo.push(media.dataForMetaInfo);
+  private __addMediaToMetaInfo(media: Media): void {
+    if (media.categoryType === "video") {
+      this._videosMatettalialnDraftMetaInfo.push(media.dataForMetaInfo);
+    } else {
+      this._audiosMatettalialnDraftMetaInfo.push(media.dataForMetaInfo);
     }
-    // 文本等其他类型暂不添加到元数据库
   }
 
   /**
    * 计算并设置草稿的总时长
+   * 完全按照Python版本实现
    */
-  private calcDuration(): void {
+  private __calcDuration(): void {
     // 1. 获取视频轨道的总时长
-    const videoDuration = this.getTrackDuration('video');
+    const videoDurations = this.__getTrackDuration("video");
     
     // 2. 设置音频轨道的总时长
-    this.setTrackDuration('audio', videoDuration);
+    this.__setTrackDuration("audio", videoDurations);
 
     // 3. 设置草稿的总时长
-    this.draftContentData.duration = videoDuration;
-    this.draftMetaInfoData.tm_duration = videoDuration;
+    this._draftContentData.duration = videoDurations;
+    this._draftMetaInfoData.tm_duration = videoDurations;
   }
 
   /**
    * 获取轨道时长
-   * @param trackType 轨道类型
-   * @returns 轨道时长（微秒）
+   * 完全按照Python版本实现
    */
-  private getTrackDuration(trackType: TrackType): number {
-    const targetTrack = this.tracksInDraftContent.find(track => track.type === trackType);
+  private __getTrackDuration(trackType: string): number {
+    const allTracks = this._tracksInDraftContent;
+    let targetTrack = null;
+    
+    for (const _track of allTracks) {
+      if (_track.type === trackType) {
+        targetTrack = _track;
+        break;
+      }
+    }
 
-    if (!targetTrack || targetTrack.segments.length === 0) {
+    if (!targetTrack) {
       return 0;
     }
 
-    // 轨道总时长 = 最后一个片段的开始时间 + 持续时间
+    if (targetTrack.segments.length === 0) {
+      return 0;
+    }
+
+    // 轨道总时长
     const lastSegment = targetTrack.segments[targetTrack.segments.length - 1];
     const lastSegmentTimerange = lastSegment.target_timerange;
-    
-    if (!lastSegmentTimerange || 
-        typeof lastSegmentTimerange.start !== 'number' || 
-        typeof lastSegmentTimerange.duration !== 'number') {
-      return 0;
-    }
-    
-    return lastSegmentTimerange.start + lastSegmentTimerange.duration;
+    const trackDuration = lastSegmentTimerange.start + lastSegmentTimerange.duration;
+    return trackDuration;
   }
 
   /**
    * 设置轨道时长
-   * @param trackType 轨道类型
-   * @param duration 目标时长（微秒）
+   * 完全按照Python版本实现
    */
-  private setTrackDuration(trackType: TrackType, duration: number): void {
-    const targetTrack = this.tracksInDraftContent.find(track => track.type === trackType);
+  private __setTrackDuration(trackType: string, duration: number): void {
+    const allTracks = this._tracksInDraftContent;
+    let targetTrack = null;
+    
+    for (const _track of allTracks) {
+      if (_track.type === trackType) {
+        targetTrack = _track;
+        break;
+      }
+    }
 
     if (!targetTrack) {
       return;
@@ -352,13 +252,12 @@ export class Draft {
 
     const segments = targetTrack.segments;
     let done = false;
-
+    
     for (const segment of segments) {
       const ssTimerange = segment.source_timerange;
       const stTimerange = segment.target_timerange;
 
       if (done) {
-        // 超出目标时长的片段设为0
         stTimerange.start = 0;
         stTimerange.duration = 0;
         ssTimerange.start = 0;
@@ -369,13 +268,37 @@ export class Draft {
         const segmentEnd = segmentStart + segmentDuration;
 
         if (segmentEnd > duration) {
-          // 裁剪超出部分
-          const newDuration = duration - segmentStart;
-          ssTimerange.duration = newDuration;
-          stTimerange.duration = newDuration;
+          ssTimerange.duration = duration - segmentStart;
+          stTimerange.duration = duration - segmentStart;
           done = true;
         }
       }
     }
+  }
+
+  /**
+   * 生成时间字符串（对应Python的time.strftime）
+   */
+  private getTimeString(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    return `${year}${month}${day}.${hour}${minute}${second}`;
+  }
+
+  /**
+   * 生成ID（简化版）
+   */
+  private generateId(): string {
+    // 使用简化的UUID生成
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    }).toUpperCase();
   }
 }
