@@ -10,9 +10,9 @@
  * 完全按照Python版本 mediaText.py 一比一还原
  */
 
-import { getSpeed, getText } from './template'
-import { Media } from './media'
-import { generateId } from '../utils/tools'
+import { getSpeed, getText } from '../../template'
+import { Media } from '../media'
+import { generateId } from '@/jianying/utils/tools'
 
 /**
  * 文本媒体处理类

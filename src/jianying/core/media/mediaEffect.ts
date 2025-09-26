@@ -4,8 +4,8 @@
  */
 
 import { Media } from './media'
-import { getVideoEffect } from './template'
-import { generateEffectData } from '../utils/tools'
+import { getVideoEffect } from '../template'
+import { generateEffectData } from '@/jianying/utils/tools'
 
 /**
  * 特效媒体处理类

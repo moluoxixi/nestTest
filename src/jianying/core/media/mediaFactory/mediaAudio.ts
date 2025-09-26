@@ -10,9 +10,9 @@
  * 完全按照Python版本 mediaAudio.py 一比一还原
  */
 
-import { getAudio, getAudioFade, getBeat, getSoundChannelMapping, getSpeed } from './template'
-import { Media } from './media'
-import { generateId } from '../utils/tools'
+import { getAudio, getAudioFade, getBeat, getSoundChannelMapping, getSpeed } from '../../template'
+import { Media } from '../media'
+import { generateId } from '@/jianying/utils/tools'
 
 /**
  * 音频媒体处理类

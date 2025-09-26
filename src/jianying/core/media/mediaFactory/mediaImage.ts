@@ -10,8 +10,8 @@
  * 完全按照Python版本 mediaImage.py 一比一还原
  */
 
-import { getItem } from '../utils/configHelper'
-import { getVideo } from './template'
+import { getItem } from '@/jianying/utils/configHelper'
+import { getVideo } from '../../template'
 import { MediaVideo } from './mediaVideo'
 
 // TODO:xiedali@2024/03/27 功能需要实现

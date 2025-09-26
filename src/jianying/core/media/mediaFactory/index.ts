@@ -11,9 +11,9 @@
  */
 
 import { existsSync } from 'node:fs'
-import { upperFirstChar } from '../utils/stringHelper'
-import { parse as parseMediaInfo } from '../utils/mediaInfo'
-import { Media } from './media'
+import { upperFirstChar } from '@/jianying/utils/stringHelper'
+import { parse as parseMediaInfo } from '@/jianying/utils/mediaInfo'
+import { Media } from '../media'
 
 // 静态导入所有媒体类（TypeScript不支持动态导入模块名）
 import { MediaVideo } from './mediaVideo'

@@ -371,3 +371,10 @@ export const draft_meta_info = {
 export type DraftContent = typeof draft_content
 
 export type DraftMetaInfo = typeof draft_meta_info
+
+export function getDraft() {
+  return JSON.parse(JSON.stringify({
+    draft_content,
+    draft_meta_info,
+  }))
+}

@@ -3,8 +3,9 @@
  * 完全按照Python版本 template.py 实现
  */
 
-import { generateId } from '../utils/tools'
+import { generateId } from '@/jianying/utils/tools'
 
+export { getDraft } from './draft'
 /**
  * 获取画布模板
  * @param guid 画布ID，如果未提供则自动生成

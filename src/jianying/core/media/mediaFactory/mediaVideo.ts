@@ -18,10 +18,10 @@ import {
   getSpeed,
   getTransition,
   getVideo,
-} from './template'
-import { Media } from './media'
-import { generateId } from '../utils/tools'
-import { AnimationData, TransitionData } from '../utils/dataStruct'
+} from '../../template'
+import { Media } from '../media'
+import { generateId } from '@/jianying/utils/tools'
+import { AnimationData, TransitionData } from '@/jianying/utils/dataStruct'
 
 /**
  * 视频媒体处理类

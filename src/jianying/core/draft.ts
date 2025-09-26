@@ -11,13 +11,10 @@
  */
 
 import { join } from 'node:path'
-import { getTimestamp } from '../utils/dateTimeHelper'
-import { createFolder, generateId, writeJson } from '../utils/tools'
-import { draft_content, draft_meta_info } from '../template/draft'
-import { Media } from './media'
-import { MediaFactory } from './mediaFactory'
-import { MediaEffect } from './mediaEffect'
-import { getTrack } from './template'
+import { getTimestamp } from '@/jianying/utils/dateTimeHelper'
+import { createFolder, generateId, writeJson } from '@/jianying/utils/tools'
+import { getDraft, getTrack } from './template'
+import { Media, MediaEffect, MediaFactory } from './media'
 
 /**
  * 草稿接口定义
@@ -67,8 +64,7 @@ export function createDraft(name: string = ''): Draft {
   const draftFolder = join(draftsRoot, name)
 
   // 从模板常量克隆草稿的基础数据
-  const draftContentData = JSON.parse(JSON.stringify(draft_content))
-  const draftMetaInfoData = JSON.parse(JSON.stringify(draft_meta_info))
+  const { draft_content: draftContentData, draft_meta_info: draftMetaInfoData } = getDraft()
 
   // 初始化草稿内容信息
   draftContentData.id = generateId()

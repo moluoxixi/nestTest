@@ -3,9 +3,9 @@
  * 完全按照Python版本 media.py 实现
  */
 
-import { generateId } from '../utils/tools'
-import { getMaterialForMetaInfo, getSegment } from './template'
-import { getBaseNameNoExtension } from '../utils/fileHelper'
+import { generateId } from '@/jianying/utils/tools'
+import { getMaterialForMetaInfo, getSegment } from '../template'
+import { getBaseNameNoExtension } from '@/jianying/utils/fileHelper'
 
 /**
  * 媒体信息接口
