@@ -12,7 +12,7 @@
 
 import { getSpeed, getText } from '../../template'
 import { Media } from '../media'
-import { generateId } from '@/jianying/utils/tools'
+import { generateId } from '@/jianying/core/utils/tools'
 
 /**
  * 文本媒体处理类

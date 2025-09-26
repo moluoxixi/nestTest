@@ -11,8 +11,8 @@
  */
 
 import { join } from 'node:path'
-import { getTimestamp } from '@/jianying/utils/dateTimeHelper'
-import { createFolder, generateId, writeJson } from '@/jianying/utils/tools'
+import { getTimestamp } from '@/jianying/core/utils/dateTimeHelper'
+import { createFolder, generateId, writeJson } from '@/jianying/core/utils/tools'
 import { getDraftTemplate, getTrack } from './template'
 import { Media, MediaEffect, MediaFactory } from './media'
 

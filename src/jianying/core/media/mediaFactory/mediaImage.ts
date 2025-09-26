@@ -10,7 +10,7 @@
  * 完全按照Python版本 mediaImage.py 一比一还原
  */
 
-import { getItem } from '@/jianying/utils/configHelper'
+import { getItem } from '@/jianying/core/utils/configHelper'
 import { getVideo } from '../../template'
 import { MediaVideo } from './mediaVideo'
 

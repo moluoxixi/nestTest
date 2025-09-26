@@ -1,4 +1,4 @@
-import { generateId } from '@/jianying/utils/tools'
+import { generateId } from '@/jianying/core/utils/tools'
 
 /**
  * 添加音频的淡入淡出效果

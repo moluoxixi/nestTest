@@ -20,8 +20,8 @@ import {
   getVideo,
 } from '../../template'
 import { Media } from '../media'
-import { generateId } from '@/jianying/utils/tools'
-import { AnimationData, TransitionData } from '@/jianying/utils/dataStruct'
+import { generateId } from '@/jianying/core/utils/tools'
+import { AnimationData, TransitionData } from '@/jianying/core/utils/dataStruct'
 
 /**
  * 视频媒体处理类
