@@ -10,10 +10,10 @@
  * 完全按照Python版本 draft.py 一比一还原
  */
 
-import { dirname, join } from 'node:path'
-import { getItem } from '../utils/configHelper'
+import { join } from 'node:path'
 import { getTimestamp } from '../utils/dateTimeHelper'
-import { createFolder, generateId, readJson, writeJson } from '../utils/tools'
+import { createFolder, generateId, writeJson } from '../utils/tools'
+import { draft_content, draft_meta_info } from '../template/draft'
 import { Media } from './media'
 import { MediaFactory } from './mediaFactory'
 import { MediaEffect } from './mediaEffect'
@@ -49,6 +49,8 @@ export interface Draft {
 const DRAFT_CONTENT_FILE_BASE_NAME = 'draft_content.json'
 const DRAFT_META_INFO_FILE_BASE_NAME = 'draft_meta_info.json'
 
+const PROJECT_PUBLIC_ROOT = join(process.cwd(), 'public')
+
 /**
  * 创建草稿
  * @param name 草稿名称，默认为时间戳格式
@@ -61,14 +63,12 @@ export function createDraft(name: string = ''): Draft {
   }
 
   // 草稿保存位置
-  const draftsRoot = getItem('JianYingDraft.basic', 'drafts_root', 'C:\\Jianying.Drafts')
+  const draftsRoot = PROJECT_PUBLIC_ROOT
   const draftFolder = join(draftsRoot, name)
 
-  // 从模板获取草稿的基础数据
-  const here = dirname(__filename)
-  const templateFolder = join(dirname(here), 'template')
-  const draftContentData = readJson(join(templateFolder, DRAFT_CONTENT_FILE_BASE_NAME))
-  const draftMetaInfoData = readJson(join(templateFolder, DRAFT_META_INFO_FILE_BASE_NAME))
+  // 从模板常量克隆草稿的基础数据
+  const draftContentData = JSON.parse(JSON.stringify(draft_content))
+  const draftMetaInfoData = JSON.parse(JSON.stringify(draft_meta_info))
 
   // 初始化草稿内容信息
   draftContentData.id = generateId()
@@ -76,7 +76,7 @@ export function createDraft(name: string = ''): Draft {
   // 初始化草稿元数据信息
   draftMetaInfoData.id = generateId()
   draftMetaInfoData.draft_fold_path = draftFolder.replace(/\\/g, '/')
-  draftMetaInfoData.draft_timeline_metetyperials_size_ = 0
+  draftMetaInfoData.draft_timeline_materials_size_ = 0
   draftMetaInfoData.tm_draft_create = getTimestamp(16)
   draftMetaInfoData.tm_draft_modified = getTimestamp(16)
   draftMetaInfoData.draft_root_path = draftsRoot.replace(/\//g, '\\')
