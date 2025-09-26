@@ -13,7 +13,7 @@
 import { join } from 'node:path'
 import { getTimestamp } from '@/jianying/utils/dateTimeHelper'
 import { createFolder, generateId, writeJson } from '@/jianying/utils/tools'
-import { getDraft, getTrack } from './template'
+import { getDraftTemplate, getTrack } from './template'
 import { Media, MediaEffect, MediaFactory } from './media'
 
 /**
@@ -64,7 +64,7 @@ export function createDraft(name: string = ''): Draft {
   const draftFolder = join(draftsRoot, name)
 
   // 从模板常量克隆草稿的基础数据
-  const { draft_content: draftContentData, draft_meta_info: draftMetaInfoData } = getDraft()
+  const { draft_content: draftContentData, draft_meta_info: draftMetaInfoData } = getDraftTemplate()
 
   // 初始化草稿内容信息
   draftContentData.id = generateId()

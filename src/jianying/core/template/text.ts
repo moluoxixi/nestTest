@@ -1,0 +1,88 @@
+import { generateId } from '@/jianying/utils/tools'
+
+/**
+ * 获取文本模板
+ * @param guid 文本ID，如果未提供则自动生成
+ * @returns 文本对象
+ */
+export function getText(guid?: string): any {
+  if (guid === undefined) {
+    guid = generateId()
+  }
+
+  return {
+    add_type: 0,
+    alignment: 1,
+    background_alpha: 1.0,
+    background_color: '',
+    background_height: 1.0,
+    background_horizontal_offset: 0.0,
+    background_round_radius: 0.0,
+    background_style: 0,
+    background_vertical_offset: 0.0,
+    background_width: 1.0,
+    bold_width: 0.0,
+    border_color: '',
+    border_width: 0.08,
+    check_flag: 7,
+    content:
+      '<font id="" path="E:/JianyingPro/4.2.0.10100/Resources/Font/SystemFont/zh-hans.ttf"><color=(1.000000, 1.000000, 1.000000, 1.000000)><size=15.000000>[默认文本]</size></color></font>',
+    font_category_id: '',
+    font_category_name: '',
+    font_id: '',
+    font_name: '',
+    font_path: 'E:/JianyingPro/4.2.0.10100/Resources/Font/SystemFont/zh-hans.ttf',
+    font_resource_id: '',
+    font_size: 15.0,
+    font_source_platform: 0,
+    font_team_id: '',
+    font_title: 'none',
+    font_url: '',
+    fonts: [],
+    force_apply_line_max_width: false,
+    global_alpha: 1.0,
+    group_id: '',
+    has_shadow: false,
+    id: guid,
+    initial_scale: 1.0,
+    is_rich_text: false,
+    italic_degree: 0,
+    ktv_color: '',
+    language: '',
+    layer_weight: 1,
+    letter_spacing: 0.0,
+    line_spacing: 0.02,
+    name: '',
+    preset_category: '',
+    preset_category_id: '',
+    preset_has_set_alignment: false,
+    preset_id: '',
+    preset_index: 0,
+    preset_name: '',
+    recognize_type: 0,
+    relevance_segment: [],
+    shadow_alpha: 0.8,
+    shadow_angle: -45.0,
+    shadow_color: '',
+    shadow_distance: 8.0,
+    shadow_point: { x: 1.0182337649086284, y: -1.0182337649086284 },
+    shadow_smoothing: 1.0,
+    shape_clip_x: false,
+    shape_clip_y: false,
+    style_name: '',
+    sub_type: 0,
+    text_alpha: 1.0,
+    text_color: '#FFFFFF',
+    text_preset_resource_id: '',
+    text_size: 30,
+    text_to_audio_ids: [],
+    tts_auto_update: false,
+    type: 'text',
+    typesetting: 0,
+    underline: false,
+    underline_offset: 0.22,
+    underline_width: 0.05,
+    use_effect_default_color: true,
+    words: [],
+  }
+}
