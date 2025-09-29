@@ -4,7 +4,7 @@
  */
 
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'node:crypto'
 import { ensureFolderExists } from './fileHelper'
 import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
 import { AnimationData, AnimationTypes, EffectData, TransitionData } from './dataStruct'
@@ -13,7 +13,7 @@ import { AnimationData, AnimationTypes, EffectData, TransitionData } from './dat
  * 生成uuid
  */
 export function generateId(): string {
-  return uuidv4().toUpperCase()
+  return randomUUID().toUpperCase()
 }
 
 /**
