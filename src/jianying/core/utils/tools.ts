@@ -3,7 +3,7 @@
  * 完全按照Python版本 tools.py 实现，一比一复刻
  */
 
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { ensureFolderExists } from './fileHelper'
 import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
@@ -41,10 +41,6 @@ export function writeJson(path: string, data: any): void {
  * @param folderPath 文件夹路径
  */
 export function createFolder(folderPath: string): void {
-  if (existsSync(folderPath)) {
-    rmSync(folderPath, { recursive: true, force: true })
-  }
-
   ensureFolderExists(folderPath)
 }
 

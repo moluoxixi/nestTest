@@ -46,21 +46,18 @@ export interface Draft {
 const DRAFT_CONTENT_FILE_BASE_NAME = 'draft_content.json'
 const DRAFT_META_INFO_FILE_BASE_NAME = 'draft_meta_info.json'
 
-const PROJECT_PUBLIC_ROOT = join(process.cwd(), 'public')
-
 /**
  * 创建草稿
+ * @param draftsRoot 草稿保存位置
  * @param name 草稿名称，默认为时间戳格式
  * @returns 草稿对象
  */
-export function createDraft(name: string = ''): Draft {
+export function createDraft(draftsRoot: string, name: string = ''): Draft {
   if (!name) {
     const now = new Date()
     name = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`
   }
 
-  // 草稿保存位置
-  const draftsRoot = PROJECT_PUBLIC_ROOT
   const draftFolder = join(draftsRoot, name)
 
   // 从模板常量克隆草稿的基础数据
@@ -105,7 +102,6 @@ export function createDraft(name: string = ''): Draft {
  * @param mediaFileFullName 媒体文件完整路径
  * @param startAtTrack 开始轨道位置，默认0
  * @param duration 持续时间，默认0
- * @param index 索引，默认0
  * @param kwargs 其他参数
  */
 export function addMedia(
@@ -113,7 +109,6 @@ export function addMedia(
   mediaFileFullName: string,
   startAtTrack: number = 0,
   duration: number = 0,
-  index: number = 0,
   kwargs: any = {},
 ): void {
   const media = MediaFactory.create(mediaFileFullName, { duration, ...kwargs })
@@ -138,7 +133,6 @@ export function addMedia(
  * @param effectNameOrResourceId 特效的名称或资源ID（内置特效可以使用名称；外置特效直接使用剪映的资源ID）
  * @param start 开始时间，默认0
  * @param duration 持续时间，默认0
- * @param _index 索引，默认0
  * @param kwargs 其他参数
  */
 export function addEffect(
@@ -146,7 +140,6 @@ export function addEffect(
   effectNameOrResourceId: string | number,
   start: number = 0,
   duration: number = 0,
-  _index: number = 0,
   kwargs: any = {},
 ): void {
   const media = new MediaEffect({
