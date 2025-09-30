@@ -1,5 +1,5 @@
-import { containerExists, dockerLogin, ensureDockerDesktop } from './utils/docker'
-import { exec, pipeExec } from './utils/exec'
+import { dockerLogin, ensureDockerDesktop } from './utils/docker'
+import { exec } from './utils/exec'
 import type { runProdParamsType } from './_types'
 import { loadEnvFromFile } from './utils/env'
 import { mkdir } from 'node:fs/promises'
@@ -28,19 +28,26 @@ function runProd(options: runProdParamsType = {}) {
   if (publish && (!username || !password || !registry))
     throw new Error('发布到远端时需要提供用户名，密码，以及远端镜像仓库地址。')
 
+  // 校验 docker.env 中 compose 所需变量
+  const { DOCKER_REGISTRY, DOCKER_NAMESPACE, DOCKER_TAG } = loadEnvFromFile({ filePath: 'docker.env' }) as Record<string, string>
+  if (!DOCKER_REGISTRY || !DOCKER_TAG)
+    throw new Error('缺少 DOCKER_REGISTRY 或 DOCKER_TAG，请在 docker.env 中配置。')
+
   // 确保宿主机静态目录存在（用于卷挂载持久化生成文件）
   const hostPublicDir = resolve(process.cwd(), 'public')
   const hostFilesDir = resolve(hostPublicDir, 'files')
   mkdir(hostFilesDir, { recursive: true }).catch(() => {})
 
-  // 使用 docker-compose（直接使用项目 compose）进行构建与启动
-  exec('docker-compose down')
-  exec('docker-compose up -d --build')
-  // 如果指定发布，则先登录再构建推送
+  // 使用 docker-compose（根据是否发布选择流程）
+  exec('docker-compose --env-file docker.env down')
   if (publish) {
     dockerLogin({ registry: registry || 'docker.io', username: username || '', password: password || '' })
-    // 使用 compose 构建并推送远端镜像（需要 compose 中的 image 为远端全名）
-    exec('docker-compose build --push')
+    // 用 docker.env 注入 compose 所需变量，先构建并推送，再启动（不重复构建）
+    exec('docker-compose --env-file docker.env build --push')
+    exec('docker-compose --env-file docker.env up -d --no-build')
+  }
+  else {
+    exec('docker-compose --env-file docker.env up -d --build')
   }
 }
 

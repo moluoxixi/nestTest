@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: crpi-qqkihjs7w7y3oxdt.cn-chengdu.personal.cr.aliyuncs.com/moluoxixi/nest-prisma-server:latest
+    image: ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_TAG}:latest
     ports:
       - '4000:4000'
     depends_on:
