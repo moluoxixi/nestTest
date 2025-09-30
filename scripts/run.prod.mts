@@ -18,47 +18,29 @@ import { resolve } from 'node:path'
  */
 function runProd(options: runProdParamsType = {}) {
   const {
-    tag,
-    containerName,
     publish,
     registry,
     username,
     password,
-    namespace,
   } = options
-  // 必填参数校验
-  if (!tag)
-    throw new Error('缺少 DOCKER_TAG')
   ensureDockerDesktop()
   // 仅在发布时强制需要用户名，密码以及远端镜像仓库地址
   if (publish && (!username || !password || !registry))
     throw new Error('发布到远端时需要提供用户名，密码，以及远端镜像仓库地址。')
-
-  const actualContainerName = containerName || tag
 
   // 确保宿主机静态目录存在（用于卷挂载持久化生成文件）
   const hostPublicDir = resolve(process.cwd(), 'public')
   const hostFilesDir = resolve(hostPublicDir, 'files')
   mkdir(hostFilesDir, { recursive: true }).catch(() => {})
 
-  // 如存在同名容器，先移除，避免 compose 起不来
-  if (containerExists({ name: actualContainerName })) {
-    pipeExec(`docker rm -f ${actualContainerName}`)
-  }
-
   // 使用 docker-compose（直接使用项目 compose）进行构建与启动
   exec('docker-compose down')
   exec('docker-compose up -d --build')
-
-  // 如需推送到远端仓库（仅推送 latest 标签）
+  // 如果指定发布，则先登录再构建推送
   if (publish) {
-    dockerLogin({ registry, username, password })
-    const remoteTag = (namespace && namespace.trim())
-      ? `${registry}/${namespace}/${tag}:latest`
-      : `${registry}/${tag}:latest`
-    // 给已构建的本地镜像追加远端 tag 并推送
-    exec(`docker tag ${tag}:latest ${remoteTag}`)
-    exec(`docker push ${remoteTag}`)
+    dockerLogin({ registry: registry || 'docker.io', username: username || '', password: password || '' })
+    // 使用 compose 构建并推送远端镜像（需要 compose 中的 image 为远端全名）
+    exec('docker-compose build --push')
   }
 }
 
@@ -77,13 +59,10 @@ const dockerEnv = loadEnvFromFile({ filePath: 'docker.env' })
 const cliPublish = parseCliBoolean('--publish')
 
 const envOptions: runProdParamsType = {
-  tag: dockerEnv.DOCKER_TAG,
-  containerName: dockerEnv.DOCKER_CONTAINER_NAME,
   publish: cliPublish,
   registry: dockerEnv.DOCKER_REGISTRY,
   username: dockerEnv.DOCKER_USERNAME,
   password: dockerEnv.DOCKER_PASSWORD,
-  namespace: dockerEnv.DOCKER_NAMESPACE,
 }
 
 runProd(envOptions)
