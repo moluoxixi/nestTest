@@ -106,10 +106,17 @@ export function createDraft(draftsRoot: string, name: string = ''): Draft {
  */
 export function addMedia(
   draft: Draft,
-  mediaFileFullName: string,
-  startAtTrack: number = 0,
-  duration: number = 0,
-  kwargs: any = {},
+  {
+    mediaFileFullName,
+    startAtTrack = 0,
+    duration = 0,
+    ...kwargs
+  }: {
+    mediaFileFullName: string
+    startAtTrack?: number
+    duration?: number
+    [_key: string]: any
+  },
 ): void {
   const media = MediaFactory.create(mediaFileFullName, { duration, ...kwargs })
 
@@ -137,10 +144,17 @@ export function addMedia(
  */
 export function addEffect(
   draft: Draft,
-  effectNameOrResourceId: string | number,
-  start: number = 0,
-  duration: number = 0,
-  kwargs: any = {},
+  {
+    effectNameOrResourceId,
+    start = 0,
+    duration = 0,
+    ...kwargs
+  }: {
+    effectNameOrResourceId: string | number
+    start?: number
+    duration?: number
+    [_key: string]: any
+  },
 ): void {
   const media = new MediaEffect({
     effect_name_or_resource_id: effectNameOrResourceId,
