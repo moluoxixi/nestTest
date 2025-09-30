@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { mkdir, writeFile, stat } from 'node:fs/promises'
+import { Buffer } from 'node:buffer'
+import { mkdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import ffmpegPath from 'ffmpeg-static'
 import { spawn } from 'node:child_process'
@@ -18,11 +19,17 @@ export class VideosService {
       const child = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] })
       let stderr = ''
       let stdout = ''
-      child.stdout?.on('data', (d: Buffer) => { stdout += d.toString?.() || String(d) })
-      child.stderr?.on('data', (d: Buffer) => { stderr += d.toString?.() || String(d) })
-      child.on('error', (err) => reject(err))
+      child.stdout?.on('data', (d: Buffer) => {
+        stdout += d.toString?.() || String(d)
+      })
+      child.stderr?.on('data', (d: Buffer) => {
+        stderr += d.toString?.() || String(d)
+      })
+      child.on('error', (err: any) => reject(err))
       child.on('close', (code) => {
-        if (code === 0) return resolve()
+        if (code === 0) {
+          return resolve()
+        }
         const detail = stderr.trim() || stdout.trim() || `exit code ${code}`
         reject(new Error(`${cmd} exited with code ${code}: ${detail}`))
       })
@@ -103,4 +110,4 @@ export class VideosService {
 
     return { firstAbs, lastAbs }
   }
-} 
+}

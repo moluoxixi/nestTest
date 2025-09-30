@@ -11,7 +11,7 @@
  */
 
 import { existsSync } from 'node:fs'
-import { upperFirstChar } from '@/jianying/core/utils/stringHelper'
+import { upperFirstChar } from '@/utils/string'
 import { parse as parseMediaInfo } from '@/jianying/core/utils/mediaInfo'
 import { Media } from '../media'
 

@@ -5,7 +5,7 @@
 
 import { generateId } from '@/jianying/core/utils/tools'
 import { getMaterialForMetaInfo, getSegment } from '../template'
-import { getBaseNameNoExtension } from '@/jianying/core/utils/fileHelper'
+import { getBaseNameNoExtension } from '@/utils/file'
 
 /**
  * 媒体信息接口

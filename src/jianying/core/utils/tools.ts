@@ -3,9 +3,7 @@
  * 完全按照Python版本 tools.py 实现，一比一复刻
  */
 
-import { readFileSync, writeFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
-import { ensureFolderExists } from './fileHelper'
 import { animationGroupDict, animationInDict, animationOutDict, effectDict, transitionDict } from './innerBizTypes'
 import { AnimationData, AnimationTypes, EffectData, TransitionData } from './dataStruct'
 
@@ -20,29 +18,23 @@ export function generateId(): string {
  * 读取json文件
  * @param path 文件路径
  */
-export function readJson(path: string): any {
-  const content = readFileSync(path, 'utf-8')
-  return JSON.parse(content)
-}
+// 已迁移到 src/utils/file.ts
+export { readJson } from '@/utils/file'
 
 /**
  * 写入json文件
  * @param path 文件路径
  * @param data 数据
  */
-export function writeJson(path: string, data: any): void {
-  // 给json.dump添加参数 ensure_ascii=false可以保证汉字不被编码
-  const content = JSON.stringify(data, null, 2)
-  writeFileSync(path, content, 'utf-8')
-}
+// 已迁移到 src/utils/file.ts
+export { writeJson } from '@/utils/file'
 
 /**
  * 创建文件夹
  * @param folderPath 文件夹路径
  */
-export function createFolder(folderPath: string): void {
-  ensureFolderExists(folderPath)
-}
+// 已迁移到 src/utils/file.ts
+export { createFolder } from '@/utils/file'
 
 /**
  * 生成特效数据

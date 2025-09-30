@@ -5,7 +5,7 @@ import type {
   jianyingComposeCreateResultType,
 } from './_types/jianying'
 import { createDraft, save } from '@/jianying/core/draft'
-import { createFolder } from '@/jianying/core/utils/tools'
+import { createFolder } from '@/utils/file'
 
 @Injectable()
 export class JianyingService {
