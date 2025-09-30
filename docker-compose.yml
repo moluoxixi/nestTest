@@ -1,16 +1,19 @@
 version: '3.8'
 services:
   nest-api:
-    container_name: nest-api
+    container_name: nest-prisma-server
     build:
       context: .
       dockerfile: Dockerfile
+    image: nest-prisma-server:latest
     ports:
       - '4000:4000'
     depends_on:
       - postgres
     env_file:
       - .env
+    environment:
+      - PORT=4000
     volumes:
       - ./public:/app/public
 

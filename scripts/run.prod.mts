@@ -3,7 +3,6 @@ import { exec, pipeExec } from './utils/exec'
 import type { runProdParamsType } from './_types'
 import { loadEnvFromFile } from './utils/env'
 import { mkdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 /**
@@ -42,28 +41,14 @@ function runProd(options: runProdParamsType = {}) {
   const hostFilesDir = resolve(hostPublicDir, 'files')
   mkdir(hostFilesDir, { recursive: true }).catch(() => {})
 
-  // 构建镜像：
-  // - 始终构建本地 tag（便于本地运行）
-  exec(`docker build -t ${tag} .`)
-  // 清理同名容器
+  // 如存在同名容器，先移除，避免 compose 起不来
   if (containerExists({ name: actualContainerName })) {
     pipeExec(`docker rm -f ${actualContainerName}`)
   }
-  // 运行容器（依赖外部 DB，通过 .env 提供 DATABASE_URL）
-  // - 容器内监听端口优先使用 .env 中的 PORT；否则回退为 3000
-  // - 将宿主机 4000 映射到容器内实际端口，确保外部访问为 4000
-  // - 将宿主机 ./public 挂载到容器 /app/public，便于持久化与对外静态访问
-  const volumeFlag = `-v "${hostPublicDir}:/app/public"`
-  // 读取 .env 的 PORT（若存在）；否则尝试使用进程环境变量 PORT
-  const hasEnvFile = existsSync(resolve(process.cwd(), '.env'))
-  const appEnv = hasEnvFile ? loadEnvFromFile({ filePath: '.env' }) : {}
-  const containerPort = Number(appEnv.PORT || process.env.PORT) || 3000
-  console.log('hostPublicDir', hostPublicDir)
-  console.log('containerPort', containerPort)
-  const envFileFlag = hasEnvFile ? '--env-file .env' : ''
-  exec(
-    `docker run -d -t --name ${actualContainerName} -p 4000:${containerPort} ${volumeFlag} ${envFileFlag} ${tag}`,
-  )
+
+  // 使用 docker-compose（直接使用项目 compose）进行构建与启动
+  exec('docker-compose down')
+  exec('docker-compose up -d --build')
 
   // 如需推送到远端仓库（仅推送 latest 标签）
   if (publish) {
